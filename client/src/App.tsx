@@ -41,7 +41,6 @@ function App() {
     setError('')
     setSuccess(false)
     setLoading(true)
-
     try {
       const res = await fetch('/bid', {
         method: 'POST',
@@ -49,9 +48,7 @@ function App() {
         body: JSON.stringify(form)
       })
       const data = await res.json()
-
       if (!res.ok) throw new Error(data.error || 'Ошибка отправки')
-
       setSuccess(true)
       setForm({ name: '', email: '', number: '', comment: '', emailOrNumber: 1 })
       setTimeout(() => setSuccess(false), 4000)
@@ -62,111 +59,305 @@ function App() {
     }
   }
 
+  // ============================================
+  // SEO: ДИНАМИЧЕСКАЯ СТРУКТУРИРОВАННАЯ РАЗМЕТКА SCHEMA.ORG
+  // Это КЛЮЧЕВОЙ момент для Google! 
+  // Google будет точно понимать, что вы — IT-компания, какие услуги предлагаете,
+  // и сможет показывать расширенные сниппеты (rich results) в поиске.
+  // Это сильно помогает ранжироваться выше конкурентов.
+  // ============================================
+  const jsonLdSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "name": "Isait",
+        "url": typeof window !== 'undefined' ? window.location.origin : "https://isait.ru",
+        "logo": "https://isait.ru/logo.png", // ← ЗАМЕНИ НА РЕАЛЬНЫЙ URL ЛОГОТИПА
+        "description": "Профессиональные IT-решения премиум уровня. Разрабатываем современные веб-сервисы и помогаем компаниям расти с помощью технологий и автоматизации бизнеса.",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer service",
+          "availableLanguage": ["ru", "Russian"]
+        }
+      },
+      // Динамически добавляем все услуги из API — Google увидит каждую услугу отдельно
+      ...(services.length > 0 
+        ? services.map((service) => ({
+            "@type": "Service",
+            "name": service.name,
+            "description": service.description,
+            "provider": {
+              "@type": "Organization",
+              "name": "Isait"
+            },
+            ...(service.imgLink && { "image": service.imgLink })
+          }))
+        : [])
+    ]
+  }
+
   return (
-    <div>
-      {/* Navbar */}
-      <nav className="navbar">
-        <div className="navbar-content">
-          <div className="logo">
-            <div className="logo-icon">IS</div>
-            <span className="logo-text">Isait</span>
-          </div>
-          <button onClick={() => document.getElementById('form')?.scrollIntoView({ behavior: 'smooth' })} className="nav-btn">
-            Оставить заявку
-          </button>
-        </div>
-      </nav>
+    <>
+      {/* 
+        SEO: Структурированные данные JSON-LD 
+        ВАЖНО: Размещаем в самом начале — Google парсит это в первую очередь.
+        Это даёт огромное преимущество в поиске по сравнению с обычными сайтами без Schema.
+      */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSchema) }}
+      />
 
-      {/* Hero */}
-      <section className="hero">
-        <div className="hero-badge">IT-РЕШЕНИЯ ПРЕМИУМ УРОВНЯ</div>
-        <h1 className="hero-title">Профессиональные<br />IT-решения для вашего бизнеса</h1>
-        <p className="hero-subtitle">Разрабатываем современные веб-сервисы и помогаем компаниям расти с помощью технологий.</p>
-
-        <div className="hero-buttons">
-          <button onClick={() => document.getElementById('form')?.scrollIntoView({ behavior: 'smooth' })} className="btn btn-primary">Оставить заявку</button>
-          <button onClick={() => document.getElementById('examples')?.scrollIntoView({ behavior: 'smooth' })} className="btn btn-secondary">Посмотреть примеры</button>
-        </div>
-      </section>
-
-      {/* Услуги */}
-      <section id="services" className="services">
-        <h2 className="section-title">Наши услуги</h2>
-        <div className="services-grid">
-          {services.length > 0 ? services.map(s => (
-            <div key={s.id} className="service-card">
-              {s.imgLink && <img src={s.imgLink} alt={s.name} className="service-img" />}
-              <div className="service-content">
-                <h3 className="service-title">{s.name}</h3>
-                <p className="service-desc">{s.description}</p>
-              </div>
+      <div>
+        {/* Navbar — semantic header + nav */}
+        <header className="navbar">
+          <nav className="navbar-content" aria-label="Основная навигация сайта">
+            <div className="logo">
+              <div className="logo-icon">IS</div>
+              <span className="logo-text">Isait</span>
             </div>
-          )) : <p style={{ color: 'rgba(255,255,255,0.6)' }}>Услуги загружаются...</p>}
-        </div>
-      </section>
-
-      {/* Примеры работ */}
-      <section id="examples" className="services bg-[#0a0a0a] py-16 border-y border-white/10">
-        <div className="max-w-6xl mx-auto px-6">
-          <h2 className="section-title">Примеры работ</h2>
-          <div className="services-grid">
-            {examples.length > 0 ? examples.map(ex => (
-              <div key={ex.id} className="service-card">
-                {ex.imgLink && <img src={ex.imgLink} alt="Пример работы" className="service-img" />}
-                <div className="service-content">
-                  <p className="service-desc">{ex.description}</p>
-                </div>
-              </div>
-            )) : (
-              <p style={{ color: 'rgba(255,255,255,0.6)' }}>Примеры работ скоро появятся...</p>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Форма заявки */}
-      <section id="form" className="form-section">
-        <div className="form-container">
-          <div className="form-header">
-            <div className="form-badge">БЫСТРЫЙ СТАРТ</div>
-            <h2 className="form-title">Оставить заявку</h2>
-            <p className="form-subtitle">Расскажите о задаче — свяжемся в течение часа</p>
-          </div>
-
-          {success && (
-            <div className="success-message">
-              <div className="success-icon">✓</div>
-              <div className="success-text">Заявка отправлена!</div>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="form">
-            <input type="text" placeholder="Ваше имя" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="input" required />
-
-            <div className="input-row">
-              <input type="email" placeholder="Email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="input" required />
-              <input type="tel" placeholder="Телефон" value={form.number} onChange={e => setForm({ ...form, number: e.target.value })} className="input" required />
-            </div>
-
-            <div className="contact-method">
-              <label className="contact-method-label">Предпочтительный способ связи</label>
-              <div className="contact-buttons">
-                <button type="button" onClick={() => setForm({ ...form, emailOrNumber: 1 })} className={`contact-btn ${form.emailOrNumber === 1 ? 'active' : ''}`}>Email</button>
-                <button type="button" onClick={() => setForm({ ...form, emailOrNumber: 0 })} className={`contact-btn ${form.emailOrNumber === 0 ? 'active' : ''}`}>Телефон</button>
-              </div>
-            </div>
-
-            <textarea placeholder="Расскажите о вашей задаче..." value={form.comment} onChange={e => setForm({ ...form, comment: e.target.value })} className="textarea" required />
-
-            {error && <p className="error-text">{error}</p>}
-
-            <button type="submit" disabled={loading} className="submit-btn">
-              {loading ? 'Отправляем...' : 'Отправить заявку'}
+            <button 
+              onClick={() => document.getElementById('form')?.scrollIntoView({ behavior: 'smooth' })} 
+              className="nav-btn"
+              aria-label="Перейти к форме заявки"
+            >
+              Оставить заявку
             </button>
-          </form>
-        </div>
-      </section>
-    </div>
+          </nav>
+        </header>
+
+        {/* Главный контент страницы — semantic main */}
+        <main>
+          {/* Hero Section */}
+          <section className="hero" aria-labelledby="hero-title">
+            <div className="hero-badge">IT-РЕШЕНИЯ ПРЕМИУМ УРОВНЯ</div>
+            <h1 id="hero-title" className="hero-title">
+              Профессиональные<br />IT-решения для вашего бизнеса
+            </h1>
+            <p className="hero-subtitle">
+              Разрабатываем современные веб-сервисы и помогаем компаниям расти с помощью технологий.
+            </p>
+            <div className="hero-buttons">
+              <button 
+                onClick={() => document.getElementById('form')?.scrollIntoView({ behavior: 'smooth' })} 
+                className="btn btn-primary"
+                aria-label="Оставить заявку на IT-решение"
+              >
+                Оставить заявку
+              </button>
+              <button 
+                onClick={() => document.getElementById('examples')?.scrollIntoView({ behavior: 'smooth' })} 
+                className="btn btn-secondary"
+                aria-label="Посмотреть примеры выполненных работ"
+              >
+                Посмотреть примеры
+              </button>
+            </div>
+          </section>
+
+          {/* Услуги — semantic section с правильным heading */}
+          <section id="services" className="services" aria-labelledby="services-title">
+            <h2 id="services-title" className="section-title">Наши услуги</h2>
+            <div className="services-grid">
+              {services.length > 0 ? (
+                services.map(s => (
+                  <div key={s.id} className="service-card">
+                    {s.imgLink && (
+                      <img 
+                        src={s.imgLink} 
+                        alt={`${s.name} — профессиональная IT-услуга для бизнеса`} 
+                        className="service-img" 
+                        loading="lazy"
+                      />
+                    )}
+                    <div className="service-content">
+                      <h3 className="service-title">{s.name}</h3>
+                      <p className="service-desc">{s.description}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p style={{ color: 'rgba(255,255,255,0.6)' }}>Услуги загружаются...</p>
+              )}
+            </div>
+          </section>
+
+          {/* Примеры работ */}
+          <section 
+            id="examples" 
+            className="services bg-[#0a0a0a] py-16 border-y border-white/10" 
+            aria-labelledby="examples-title"
+          >
+            <div className="max-w-6xl mx-auto px-6">
+              <h2 id="examples-title" className="section-title">Примеры работ</h2>
+              <div className="services-grid">
+                {examples.length > 0 ? (
+                  examples.map(ex => (
+                    <div key={ex.id} className="service-card">
+                      {ex.imgLink && (
+                        <img 
+                          src={ex.imgLink} 
+                          alt={`Пример реализованного проекта: ${ex.description ? ex.description.substring(0, 80) : 'IT-решение для бизнеса'}`} 
+                          className="service-img" 
+                          loading="lazy"
+                        />
+                      )}
+                      <div className="service-content">
+                        <p className="service-desc">{ex.description}</p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p style={{ color: 'rgba(255,255,255,0.6)' }}>Примеры работ скоро появятся...</p>
+                )}
+              </div>
+            </div>
+          </section>
+
+          {/* Форма заявки — semantic section + accessible form */}
+          <section id="form" className="form-section" aria-labelledby="form-title">
+            <div className="form-container">
+              <div className="form-header">
+                <div className="form-badge">БЫСТРЫЙ СТАРТ</div>
+                <h2 id="form-title" className="form-title">Оставить заявку</h2>
+                <p className="form-subtitle">Расскажите о задаче — свяжемся в течение часа</p>
+              </div>
+
+              {success && (
+                <div className="success-message" role="alert" aria-live="polite">
+                  <div className="success-icon">✓</div>
+                  <div className="success-text">Заявка отправлена! Мы свяжемся с вами в ближайшее время.</div>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="form" noValidate>
+                {/* Имя */}
+                <div>
+                  <label htmlFor="name" className="sr-only">Ваше имя</label>
+                  <input 
+                    id="name"
+                    type="text" 
+                    placeholder="Ваше имя" 
+                    value={form.name} 
+                    onChange={e => setForm({ ...form, name: e.target.value })} 
+                    className="input" 
+                    required 
+                    aria-label="Ваше имя"
+                    autoComplete="name"
+                  />
+                </div>
+
+                {/* Email + Телефон в ряд */}
+                <div className="input-row">
+                  <div>
+                    <label htmlFor="email" className="sr-only">Email</label>
+                    <input 
+                      id="email"
+                      type="email" 
+                      placeholder="Email" 
+                      value={form.email} 
+                      onChange={e => setForm({ ...form, email: e.target.value })} 
+                      className="input" 
+                      required 
+                      aria-label="Email для связи"
+                      autoComplete="email"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="number" className="sr-only">Телефон</label>
+                    <input 
+                      id="number"
+                      type="tel" 
+                      placeholder="Телефон" 
+                      value={form.number} 
+                      onChange={e => setForm({ ...form, number: e.target.value })} 
+                      className="input" 
+                      required 
+                      aria-label="Номер телефона для связи"
+                      autoComplete="tel"
+                    />
+                  </div>
+                </div>
+
+                {/* Способ связи — accessible radiogroup */}
+                <div 
+                  className="contact-method" 
+                  role="radiogroup" 
+                  aria-labelledby="contact-method-label"
+                >
+                  <label id="contact-method-label" className="contact-method-label">
+                    Предпочтительный способ связи
+                  </label>
+                  <div className="contact-buttons">
+                    <button 
+                      type="button" 
+                      role="radio"
+                      aria-checked={form.emailOrNumber === 1}
+                      onClick={() => setForm({ ...form, emailOrNumber: 1 })} 
+                      className={`contact-btn ${form.emailOrNumber === 1 ? 'active' : ''}`}
+                      aria-label="Связаться по электронной почте"
+                    >
+                      Email
+                    </button>
+                    <button 
+                      type="button" 
+                      role="radio"
+                      aria-checked={form.emailOrNumber === 0}
+                      onClick={() => setForm({ ...form, emailOrNumber: 0 })} 
+                      className={`contact-btn ${form.emailOrNumber === 0 ? 'active' : ''}`}
+                      aria-label="Связаться по телефону"
+                    >
+                      Телефон
+                    </button>
+                  </div>
+                </div>
+
+                {/* Комментарий */}
+                <div>
+                  <label htmlFor="comment" className="sr-only">Расскажите о вашей задаче</label>
+                  <textarea 
+                    id="comment"
+                    placeholder="Расскажите о вашей задаче..." 
+                    value={form.comment} 
+                    onChange={e => setForm({ ...form, comment: e.target.value })} 
+                    className="textarea" 
+                    required 
+                    aria-label="Подробное описание вашей задачи или проекта"
+                  />
+                </div>
+
+                {error && <p className="error-text" role="alert">{error}</p>}
+
+                <button 
+                  type="submit" 
+                  disabled={loading} 
+                  className="submit-btn"
+                  aria-label={loading ? "Отправка заявки..." : "Отправить заявку на IT-решение"}
+                >
+                  {loading ? 'Отправляем...' : 'Отправить заявку'}
+                </button>
+              </form>
+            </div>
+          </section>
+        </main>
+
+        {/* Footer — semantic footer с ключевыми словами для SEO */}
+        <footer className="footer">
+          <div className="max-w-6xl mx-auto px-6 py-12 text-center text-sm text-white/60">
+            <p>© {new Date().getFullYear()} Isait. Все права защищены.</p>
+            <p className="mt-2">
+              Профессиональные IT-решения премиум уровня для бизнеса • 
+              Разработка веб-сервисов • Автоматизация бизнес-процессов • IT-консалтинг
+            </p>
+            <p className="mt-1">
+              Помогаем компаниям расти с помощью современных технологий. 
+              Свяжитесь с нами — ответим в течение часа.
+            </p>
+          </div>
+        </footer>
+      </div>
+    </>
   )
 }
 
