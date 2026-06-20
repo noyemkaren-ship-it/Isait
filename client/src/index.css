@@ -1,421 +1,182 @@
-/* ==================== ИДЕАЛЬНЫЙ ТЁМНЫЙ ПРЕМИУМ ДИЗАЙН ==================== */
-/* Авторский CSS с нуля — без готовых библиотек и утилит */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   ISAIT — Premium Dark Theme
+   Идеальный index.css под твой app.tsx
+   ============================================ */
 
 :root {
   --bg-primary: #050505;
   --bg-secondary: #0a0a0a;
   --bg-card: #111111;
-  --text-primary: #ededed;
-  --text-secondary: #a1a1aa;
-  --accent: #22d3ee;
-  --accent-hover: #67e8f9;
-  --border: #27272a;
-  --success: #10b981;
-  --error: #ef4444;
+  --border: rgba(255, 255, 255, 0.1);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --accent: #06b6d4;
+  --accent-hover: #22d3ee;
 }
 
 /* Базовые стили */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+html {
+  scroll-behavior: smooth;
 }
 
-html, body {
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-#root {
-  background-color: var(--bg-primary);
+/* Кастомный скроллбар */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #111;
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 20px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
-/* ==================== НАВБАР ==================== */
-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  background-color: rgba(5, 5, 5, 0.95);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
+/* Выделение текста */
+::selection {
+  background-color: rgba(6, 182, 212, 0.3);
+  color: white;
 }
 
-.nav-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 16px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* ============================================
+   СТИЛИ ФОРМЫ (инпуты и textarea)
+   ============================================ */
+
+input,
+textarea {
+  width: 100%;
+  background-color: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: white;
+  padding: 16px 20px;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 400;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo-circle {
-  width: 40px;
-  height: 40px;
-  background-color: var(--accent);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  color: #050505;
-  font-size: 18px;
-}
-
-.logo-text {
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: -1px;
-}
-
-.nav-button {
-  background-color: var(--text-primary);
-  color: var(--bg-primary);
-  padding: 12px 24px;
-  border-radius: 9999px;
-  font-weight: 600;
-  font-size: 15px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.nav-button:hover {
-  background-color: var(--accent);
-  color: var(--bg-primary);
+input:focus,
+textarea:focus {
+  border-color: var(--accent);
+  background-color: #222222;
+  box-shadow: 
+    0 0 0 4px rgba(6, 182, 212, 0.1),
+    0 1px 2px rgba(0, 0, 0, 0.1);
   transform: translateY(-1px);
 }
 
-/* ==================== HERO ==================== */
-.hero {
-  padding-top: 120px;
-  padding-bottom: 80px;
-  text-align: center;
-  max-width: 900px;
-  margin: 0 auto;
-  padding-left: 24px;
-  padding-right: 24px;
+input::placeholder,
+textarea::placeholder {
+  color: rgba(255, 255, 255, 0.35);
 }
 
-.hero-badge {
-  display: inline-block;
-  background-color: rgba(34, 211, 238, 0.1);
-  color: var(--accent);
-  padding: 6px 18px;
-  border-radius: 9999px;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  margin-bottom: 24px;
-}
-
-.hero-title {
-  font-size: 72px;
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -4px;
-  margin-bottom: 24px;
-}
-
-.hero-subtitle {
-  font-size: 22px;
-  color: var(--text-secondary);
-  max-width: 620px;
-  margin: 0 auto 40px;
-  line-height: 1.5;
-}
-
-.hero-buttons {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.btn-primary {
-  background-color: var(--text-primary);
-  color: var(--bg-primary);
-  padding: 18px 36px;
-  border-radius: 9999px;
-  font-size: 18px;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-primary:hover {
-  background-color: var(--accent);
-  color: var(--bg-primary);
-  transform: translateY(-2px);
-}
-
-.btn-secondary {
-  background-color: transparent;
-  color: var(--text-primary);
-  padding: 18px 36px;
-  border-radius: 9999px;
-  font-size: 18px;
-  font-weight: 600;
-  border: 1px solid var(--border);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-secondary:hover {
-  background-color: rgba(255,255,255,0.05);
-  border-color: var(--text-primary);
-}
-
-/* ==================== СЕКЦИИ ==================== */
-.section {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px 80px;
-}
-
-.section-title {
-  font-size: 48px;
-  font-weight: 800;
-  margin-bottom: 48px;
-  letter-spacing: -2px;
-}
-
-/* ==================== КАРТОЧКИ УСЛУГ ==================== */
-.services-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 24px;
-}
-
-.service-card {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-.service-card:hover {
-  transform: translateY(-8px);
-  border-color: var(--accent);
-  box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.5);
-}
-
-.service-image {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-  background-color: #1a1a1a;
-}
-
-.service-content {
-  padding: 32px;
-}
-
-.service-title {
-  font-size: 26px;
-  font-weight: 700;
-  margin-bottom: 16px;
-  line-height: 1.2;
-}
-
-.service-description {
-  color: var(--text-secondary);
-  font-size: 17px;
-  line-height: 1.7;
-}
-
-/* ==================== ФОРМА ЗАЯВКИ ==================== */
-.form-section {
-  background-color: var(--bg-secondary);
-  padding: 100px 0;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
-
-.form-container {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-.form-header {
-  text-align: center;
-  margin-bottom: 48px;
-}
-
-.form-badge {
-  color: var(--accent);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 3px;
-  margin-bottom: 12px;
-}
-
-.form-title {
-  font-size: 56px;
-  font-weight: 800;
-  letter-spacing: -3px;
-  margin-bottom: 16px;
-}
-
-.form-subtitle {
-  font-size: 20px;
-  color: var(--text-secondary);
-}
-
-.form-card {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 28px;
-  padding: 48px;
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6);
-}
-
-.form-group {
-  margin-bottom: 24px;
-}
-
-.form-label {
-  display: block;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 10px;
-}
-
-.form-input,
-.form-textarea {
-  width: 100%;
-  background-color: #1a1a1a;
-  border: 1px solid var(--border);
-  color: var(--text-primary);
-  padding: 18px 22px;
-  border-radius: 16px;
-  font-size: 17px;
-  transition: all 0.2s ease;
-}
-
-.form-input:focus,
-.form-textarea:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.1);
-  outline: none;
-  background-color: #222222;
-}
-
-.form-textarea {
-  min-height: 160px;
+textarea {
   resize: vertical;
+  min-height: 140px;
+  line-height: 1.6;
 }
 
-.contact-method {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 32px;
-}
-
-.contact-btn {
-  flex: 1;
-  padding: 16px;
-  background-color: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-primary);
-  border-radius: 16px;
-  font-size: 17px;
+/* Кнопки выбора способа связи */
+button[type="button"] {
+  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  letter-spacing: 0.3px;
 }
 
-.contact-btn.active {
-  background-color: var(--accent);
-  border-color: var(--accent);
-  color: #050505;
+button[type="button"]:hover:not(.bg-cyan-500) {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
-.contact-btn:hover:not(.active) {
-  background-color: #1f1f1f;
-  border-color: #444444;
+/* ============================================
+   КАРТОЧКИ УСЛУГ
+   ============================================ */
+
+.group {
+  transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), 
+              box-shadow 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
-.submit-btn {
-  width: 100%;
-  background-color: var(--text-primary);
-  color: var(--bg-primary);
-  padding: 20px;
-  border-radius: 9999px;
-  font-size: 20px;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 12px;
+.group:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 
+              0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
-.submit-btn:hover {
-  background-color: var(--accent);
-  color: var(--bg-primary);
-  transform: translateY(-2px);
+.group img {
+  transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
-.submit-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.group:hover img {
+  transform: scale(1.08);
 }
 
-/* Успех */
-.success-message {
-  background-color: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.4);
-  border-radius: 20px;
-  padding: 32px;
-  text-align: center;
-  margin-bottom: 32px;
+/* ============================================
+   КНОПКИ И ГЕРОЙ
+   ============================================ */
+
+button {
+  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
-.success-icon {
-  font-size: 56px;
-  margin-bottom: 12px;
+button.bg-white:hover {
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.15);
+  transform: translateY(-2px) scale(1.01);
 }
 
-.success-text {
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--success);
+/* Сообщение об успешной отправке */
+.bg-emerald-500\/10 {
+  animation: fadeInUp 0.4s ease-out;
 }
 
-/* ==================== ФУТЕР ==================== */
-footer {
-  text-align: center;
-  padding: 60px 24px;
-  color: var(--text-secondary);
-  font-size: 15px;
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* ==================== АДАПТИВ ==================== */
+/* ============================================
+   МОБИЛЬНАЯ АДАПТАЦИЯ
+   ============================================ */
+
 @media (max-width: 768px) {
-  .hero-title {
-    font-size: 48px;
+  input,
+  textarea {
+    padding: 14px 16px;
+    font-size: 15px;
   }
   
-  .form-title {
-    font-size: 42px;
+  .group:hover {
+    transform: none;
   }
-  
-  .form-card {
-    padding: 32px 24px;
-  }
+}
+
+/* Фокус для доступности */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
