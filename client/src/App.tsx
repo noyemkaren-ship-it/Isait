@@ -7,6 +7,12 @@ interface Service {
   imgLink: string
 }
 
+interface Example {
+  id: number
+  description: string
+  imgLink: string
+}
+
 interface FormData {
   name: string
   email: string
@@ -17,6 +23,7 @@ interface FormData {
 
 function App() {
   const [services, setServices] = useState<Service[]>([])
+  const [examples, setExamples] = useState<Example[]>([])
   const [form, setForm] = useState<FormData>({
     name: '', email: '', number: '', comment: '', emailOrNumber: 1
   })
@@ -25,10 +32,8 @@ function App() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    fetch('/services')
-      .then(res => res.json())
-      .then(setServices)
-      .catch(console.error)
+    fetch('/services').then(res => res.json()).then(setServices).catch(console.error)
+    fetch('/examples').then(res => res.json()).then(setExamples).catch(console.error)
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,20 +48,14 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
       })
-
       const data = await res.json()
 
-      if (!res.ok) {
-        console.error('Ошибка от сервера:', data)
-        throw new Error(data.error || 'Ошибка отправки заявки')
-      }
+      if (!res.ok) throw new Error(data.error || 'Ошибка отправки')
 
       setSuccess(true)
       setForm({ name: '', email: '', number: '', comment: '', emailOrNumber: 1 })
       setTimeout(() => setSuccess(false), 4000)
-
     } catch (err: any) {
-      console.error(err)
       setError(err.message || 'Не удалось отправить заявку')
     } finally {
       setLoading(false)
@@ -86,7 +85,7 @@ function App() {
 
         <div className="hero-buttons">
           <button onClick={() => document.getElementById('form')?.scrollIntoView({ behavior: 'smooth' })} className="btn btn-primary">Оставить заявку</button>
-          <button onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })} className="btn btn-secondary">Посмотреть услуги</button>
+          <button onClick={() => document.getElementById('examples')?.scrollIntoView({ behavior: 'smooth' })} className="btn btn-secondary">Посмотреть примеры</button>
         </div>
       </section>
 
@@ -106,7 +105,26 @@ function App() {
         </div>
       </section>
 
-      {/* Форма */}
+      {/* Примеры работ */}
+      <section id="examples" className="services bg-[#0a0a0a] py-16 border-y border-white/10">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="section-title">Примеры работ</h2>
+          <div className="services-grid">
+            {examples.length > 0 ? examples.map(ex => (
+              <div key={ex.id} className="service-card">
+                {ex.imgLink && <img src={ex.imgLink} alt="Пример работы" className="service-img" />}
+                <div className="service-content">
+                  <p className="service-desc">{ex.description}</p>
+                </div>
+              </div>
+            )) : (
+              <p style={{ color: 'rgba(255,255,255,0.6)' }}>Примеры работ скоро появятся...</p>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Форма заявки */}
       <section id="form" className="form-section">
         <div className="form-container">
           <div className="form-header">
