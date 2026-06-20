@@ -441,6 +441,10 @@ body {
   margin-top: -8px;
 }
 
+.footer {
+  text-align: center;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .hero-title { font-size: 42px; letter-spacing: -2px; }
