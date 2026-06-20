@@ -5,12 +5,24 @@ import { print } from "./log/log";
 import { encrypt, decrypt } from "./auth/token";
 import cookieParser from 'cookie-parser';
 import router from "./router/router";
+import cors from "cors";
+
+
 const app = express();
 
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
+
+app.use(cors({
+  origin: [
+    'http://46.253.132.225:8000',
+    'http://46.253.132.225',
+    'http://localhost:8000'
+  ],
+  credentials: true
+}))
 
 const eta = new Eta({
   views: path.join(__dirname, "../views"),

@@ -15,8 +15,6 @@ interface FormData {
   emailOrNumber: number
 }
 
-const API = 'http://46.253.132.225:3000'
-
 function App() {
   const [services, setServices] = useState<Service[]>([])
   const [form, setForm] = useState<FormData>({
@@ -27,7 +25,7 @@ function App() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    fetch(`${API}/services`)
+    fetch('/services')
       .then(res => res.json())
       .then(setServices)
       .catch(console.error)
@@ -40,18 +38,26 @@ function App() {
     setLoading(true)
 
     try {
-      const res = await fetch(`${API}/bid`, {
+      const res = await fetch('/bid', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
       })
-      if (!res.ok) throw new Error('Ошибка отправки')
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        console.error('Ошибка от сервера:', data)
+        throw new Error(data.error || 'Ошибка отправки заявки')
+      }
 
       setSuccess(true)
       setForm({ name: '', email: '', number: '', comment: '', emailOrNumber: 1 })
       setTimeout(() => setSuccess(false), 4000)
-    } catch {
-      setError('Не удалось отправить заявку. Попробуйте позже.')
+
+    } catch (err: any) {
+      console.error(err)
+      setError(err.message || 'Не удалось отправить заявку')
     } finally {
       setLoading(false)
     }
@@ -96,7 +102,7 @@ function App() {
                 <p className="service-desc">{s.description}</p>
               </div>
             </div>
-          )) : <p style={{color: 'rgba(255,255,255,0.6)'}}>Услуги загружаются...</p>}
+          )) : <p style={{ color: 'rgba(255,255,255,0.6)' }}>Услуги загружаются...</p>}
         </div>
       </section>
 
@@ -117,22 +123,22 @@ function App() {
           )}
 
           <form onSubmit={handleSubmit} className="form">
-            <input type="text" placeholder="Ваше имя" value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="input" required />
+            <input type="text" placeholder="Ваше имя" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="input" required />
 
             <div className="input-row">
-              <input type="email" placeholder="Email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} className="input" required />
-              <input type="tel" placeholder="Телефон" value={form.number} onChange={e => setForm({...form, number: e.target.value})} className="input" required />
+              <input type="email" placeholder="Email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="input" required />
+              <input type="tel" placeholder="Телефон" value={form.number} onChange={e => setForm({ ...form, number: e.target.value })} className="input" required />
             </div>
 
             <div className="contact-method">
               <label className="contact-method-label">Предпочтительный способ связи</label>
               <div className="contact-buttons">
-                <button type="button" onClick={() => setForm({...form, emailOrNumber: 1})} className={`contact-btn ${form.emailOrNumber === 1 ? 'active' : ''}`}>Email</button>
-                <button type="button" onClick={() => setForm({...form, emailOrNumber: 0})} className={`contact-btn ${form.emailOrNumber === 0 ? 'active' : ''}`}>Телефон</button>
+                <button type="button" onClick={() => setForm({ ...form, emailOrNumber: 1 })} className={`contact-btn ${form.emailOrNumber === 1 ? 'active' : ''}`}>Email</button>
+                <button type="button" onClick={() => setForm({ ...form, emailOrNumber: 0 })} className={`contact-btn ${form.emailOrNumber === 0 ? 'active' : ''}`}>Телефон</button>
               </div>
             </div>
 
-            <textarea placeholder="Расскажите о вашей задаче..." value={form.comment} onChange={e => setForm({...form, comment: e.target.value})} className="textarea" required />
+            <textarea placeholder="Расскажите о вашей задаче..." value={form.comment} onChange={e => setForm({ ...form, comment: e.target.value })} className="textarea" required />
 
             {error && <p className="error-text">{error}</p>}
 
