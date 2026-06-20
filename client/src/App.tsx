@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 
-// Types
 interface Service {
   id: number
   name: string
@@ -8,122 +7,68 @@ interface Service {
   imgLink: string
 }
 
-interface BidForm {
+interface FormData {
   name: string
   email: string
   number: string
   comment: string
-  emailOrNumber: number // 1 = email, 0 = phone
+  emailOrNumber: number
 }
 
-const API_URL = 'http://46.253.132.225:5000'
+const API = 'http://46.253.132.225:5000'
 
 function App() {
-  // Services
   const [services, setServices] = useState<Service[]>([])
-  const [loadingServices, setLoadingServices] = useState(true)
-
-  // Bid Form
-  const [form, setForm] = useState<BidForm>({
-    name: '',
-    email: '',
-    number: '',
-    comment: '',
-    emailOrNumber: 1,
+  const [form, setForm] = useState<FormData>({
+    name: '', email: '', number: '', comment: '', emailOrNumber: 1
   })
-  const [submitting, setSubmitting] = useState(false)
-  const [submitSuccess, setSubmitSuccess] = useState(false)
-  const [submitError, setSubmitError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [error, setError] = useState('')
 
-  // Fetch services
   useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        const res = await fetch(`${API_URL}/services`)
-        if (!res.ok) throw new Error('Ошибка загрузки услуг')
-        const data: Service[] = await res.json()
-        setServices(data)
-      } catch (err) {
-        console.error(err)
-      } finally {
-        setLoadingServices(false)
-      }
-    }
-    fetchServices()
+    fetch(`${API}/services`)
+      .then(res => res.json())
+      .then(setServices)
+      .catch(console.error)
   }, [])
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setForm(prev => ({ ...prev, [name]: value }))
-  }
-
-  const handleContactMethod = (method: number) => {
-    setForm(prev => ({ ...prev, emailOrNumber: method }))
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitError('')
-    setSubmitSuccess(false)
-
-    if (!form.name || !form.email || !form.number || !form.comment) {
-      setSubmitError('Пожалуйста, заполните все обязательные поля')
-      return
-    }
-    if (!/\S+@\S+\.\S+/.test(form.email)) {
-      setSubmitError('Введите корректный email')
-      return
-    }
-
-    setSubmitting(true)
+    setError('')
+    setSuccess(false)
+    setLoading(true)
 
     try {
-      const res = await fetch(`${API_URL}/bid`, {
+      const res = await fetch(`${API}/bid`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify(form)
       })
+      if (!res.ok) throw new Error('Ошибка отправки')
 
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}))
-        throw new Error(errorData.error || 'Ошибка отправки заявки')
-      }
-
-      setSubmitSuccess(true)
-      setForm({
-        name: '',
-        email: '',
-        number: '',
-        comment: '',
-        emailOrNumber: 1,
-      })
-      setTimeout(() => setSubmitSuccess(false), 5000)
-
-    } catch (err: any) {
-      setSubmitError(err.message || 'Произошла ошибка. Попробуйте позже.')
+      setSuccess(true)
+      setForm({ name: '', email: '', number: '', comment: '', emailOrNumber: 1 })
+      setTimeout(() => setSuccess(false), 4000)
+    } catch (err) {
+      setError('Не удалось отправить заявку. Попробуйте позже.')
     } finally {
-      setSubmitting(false)
+      setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white font-sans">
+    <div className="min-h-screen bg-[#050505] text-white">
       {/* Navbar */}
-      <nav className="border-b border-white/10 bg-zinc-950/80 backdrop-blur-lg fixed w-full z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <nav className="fixed w-full bg-black/90 backdrop-blur-lg z-50 border-b border-white/10">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-cyan-500 rounded-xl flex items-center justify-center">
-              <span className="font-bold text-xl">IS</span>
-            </div>
-            <span className="font-semibold text-2xl tracking-tight">Isait</span>
-          </div>
-          <div className="flex items-center gap-8 text-sm">
-            <a href="#services" className="hover:text-cyan-400 transition-colors">Услуги</a>
-            <a href="#form" className="hover:text-cyan-400 transition-colors">Оставить заявку</a>
+            <div className="w-9 h-9 bg-cyan-500 rounded-xl flex items-center justify-center font-bold">IS</div>
+            <span className="text-2xl font-semibold">Isait</span>
           </div>
           <button 
             onClick={() => document.getElementById('form')?.scrollIntoView({ behavior: 'smooth' })}
-            className="px-6 py-2.5 bg-white text-zinc-950 rounded-2xl font-medium hover:bg-cyan-400 hover:text-white transition-all active:scale-[0.985]"
+            className="px-6 py-2.5 bg-white text-black rounded-2xl font-semibold hover:bg-cyan-400 hover:text-white transition-all"
           >
             Оставить заявку
           </button>
@@ -131,150 +76,104 @@ function App() {
       </nav>
 
       {/* Hero */}
-      <section className="pt-24 pb-20 px-6 max-w-5xl mx-auto text-center">
-        <div className="inline-block px-4 py-1.5 rounded-full bg-white/5 text-cyan-400 text-sm font-medium mb-6 tracking-wider">
-          IT-РЕШЕНИЯ ПРЕМИУМ УРОВНЯ
-        </div>
-        <h1 className="text-7xl font-semibold tracking-tighter leading-none mb-6">
+      <section className="pt-24 pb-16 px-6 max-w-5xl mx-auto text-center">
+        <div className="text-cyan-400 text-sm tracking-[3px] mb-4">IT-РЕШЕНИЯ ПРЕМИУМ УРОВНЯ</div>
+        <h1 className="text-6xl md:text-7xl font-bold tracking-tighter mb-6">
           Профессиональные<br />IT-решения для вашего бизнеса
         </h1>
-        <p className="max-w-2xl mx-auto text-xl text-white/70 mb-10">
-          Разрабатываем современные веб-сервисы, автоматизируем процессы и помогаем компаниям расти с помощью технологий.
+        <p className="max-w-2xl mx-auto text-xl text-white/70 mb-8">
+          Разрабатываем современные веб-сервисы и помогаем компаниям расти с помощью технологий.
         </p>
         <div className="flex gap-4 justify-center">
           <button 
             onClick={() => document.getElementById('form')?.scrollIntoView({ behavior: 'smooth' })}
-            className="px-8 py-4 bg-cyan-500 hover:bg-cyan-600 rounded-3xl font-semibold text-lg transition-all active:scale-[0.985]"
+            className="px-8 py-4 bg-white text-black rounded-3xl font-semibold text-lg"
           >
             Оставить заявку
           </button>
           <button 
             onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
-            className="px-8 py-4 border border-white/20 hover:bg-white/5 rounded-3xl font-semibold text-lg transition-all"
+            className="px-8 py-4 border border-white/30 rounded-3xl font-semibold text-lg hover:bg-white/5"
           >
             Посмотреть услуги
           </button>
         </div>
       </section>
 
-      {/* Services */}
-      <section id="services" className="max-w-7xl mx-auto px-6 pb-24">
-        <div className="flex items-end justify-between mb-10">
-          <div>
-            <div className="text-cyan-400 text-sm font-medium tracking-[3px] mb-2">ЧТО МЫ ДЕЛАЕМ</div>
-            <h2 className="text-5xl font-semibold tracking-tight">Наши услуги</h2>
-          </div>
-        </div>
-
-        {loadingServices ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1,2,3].map(i => <div key={i} className="h-64 bg-white/5 rounded-3xl animate-pulse" />)}
-          </div>
-        ) : services.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((service) => (
-              <div key={service.id} className="group bg-white/5 hover:bg-white/10 border border-white/10 rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-1">
-                {service.imgLink && (
-                  <div className="h-48 bg-zinc-900 overflow-hidden">
-                    <img 
-                      src={service.imgLink.startsWith('http') ? service.imgLink : `${API_URL}${service.imgLink}`} 
-                      alt={service.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                )}
-                <div className="p-8">
-                  <h3 className="text-2xl font-semibold mb-3 tracking-tight">{service.name}</h3>
-                  <p className="text-white/70 leading-relaxed">{service.description}</p>
-                </div>
+      {/* Услуги */}
+      <section id="services" className="max-w-6xl mx-auto px-6 pb-20">
+        <h2 className="text-5xl font-bold mb-10">Наши услуги</h2>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {services.length > 0 ? services.map(s => (
+            <div key={s.id} className="group bg-[#111] border border-white/10 rounded-3xl overflow-hidden">
+              {s.imgLink && <img src={s.imgLink} alt="" className="w-full h-48 object-cover" />}
+              <div className="p-8">
+                <h3 className="text-2xl font-semibold mb-3">{s.name}</h3>
+                <p className="text-white/70">{s.description}</p>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12 text-white/60">Услуги пока не добавлены.</div>
-        )}
+            </div>
+          )) : (
+            <p className="text-white/60">Услуги загружаются...</p>
+          )}
+        </div>
       </section>
 
-      {/* === КРАСИВАЯ ФОРМА ЗАЯВКИ (BID) === */}
-      <section id="form" className="bg-zinc-900 py-20 px-6 border-y border-white/10">
-        <div className="max-w-3xl mx-auto">
+      {/* Форма заявки */}
+      <section id="form" className="bg-[#0a0a0a] py-20 px-6 border-y border-white/10">
+        <div className="max-w-2xl mx-auto">
           <div className="text-center mb-12">
-            <div className="inline-block px-4 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-sm font-medium mb-4">
-              БЫСТРЫЙ СТАРТ
-            </div>
-            <h2 className="text-6xl font-semibold tracking-tighter mb-4">Оставить заявку</h2>
-            <p className="text-xl text-white/70">Расскажите о задаче — мы свяжемся с вами в течение 1 часа</p>
+            <div className="text-cyan-400 text-sm tracking-widest mb-3">БЫСТРЫЙ СТАРТ</div>
+            <h2 className="text-6xl font-bold tracking-tighter">Оставить заявку</h2>
+            <p className="text-xl text-white/70 mt-3">Расскажите о задаче — свяжемся в течение часа</p>
           </div>
 
-          {submitSuccess && (
-            <div className="mb-8 p-6 bg-emerald-500/10 border border-emerald-500/30 rounded-3xl text-center">
-              <div className="text-emerald-400 text-5xl mb-3">✓</div>
-              <div className="text-2xl font-semibold text-emerald-400 mb-1">Заявка успешно отправлена!</div>
-              <p className="text-white/70">Наш менеджер свяжется с вами в ближайшее время.</p>
+          {success && (
+            <div className="mb-8 p-6 bg-emerald-500/10 border border-emerald-500/40 rounded-3xl text-center">
+              <div className="text-5xl mb-2">✓</div>
+              <div className="text-2xl font-semibold text-emerald-400">Заявка отправлена!</div>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="bg-zinc-950 border border-white/10 rounded-3xl p-10 space-y-8">
-            {/* Имя */}
-            <div>
-              <label className="block text-sm font-medium text-white/80 mb-2">Ваше имя</label>
-              <input type="text" name="name" value={form.name} onChange={handleChange} placeholder="Иван Иванов"
-                className="w-full bg-zinc-900 border border-white/10 focus:border-cyan-500 rounded-2xl px-6 py-4 text-lg placeholder:text-white/40 outline-none transition-all" required />
-            </div>
-
+          <form onSubmit={handleSubmit} className="bg-[#111] border border-white/10 rounded-3xl p-10 space-y-6">
+            <input 
+              type="text" placeholder="Ваше имя" 
+              value={form.name} onChange={e => setForm({...form, name: e.target.value})} required 
+            />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">Email</label>
-                <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="you@company.com"
-                  className="w-full bg-zinc-900 border border-white/10 focus:border-cyan-500 rounded-2xl px-6 py-4 text-lg placeholder:text-white/40 outline-none transition-all" required />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">Телефон</label>
-                <input type="tel" name="number" value={form.number} onChange={handleChange} placeholder="+7 (999) 123-45-67"
-                  className="w-full bg-zinc-900 border border-white/10 focus:border-cyan-500 rounded-2xl px-6 py-4 text-lg placeholder:text-white/40 outline-none transition-all" required />
-              </div>
+              <input type="email" placeholder="Email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} required />
+              <input type="tel" placeholder="Телефон" value={form.number} onChange={e => setForm({...form, number: e.target.value})} required />
             </div>
 
-            {/* Способ связи */}
             <div>
-              <label className="block text-sm font-medium text-white/80 mb-3">Предпочтительный способ связи</label>
+              <label className="block mb-2 text-sm text-white/70">Предпочтительный способ связи</label>
               <div className="flex gap-3">
-                <button type="button" onClick={() => handleContactMethod(1)}
-                  className={`flex-1 py-4 rounded-2xl border transition-all font-medium ${form.emailOrNumber === 1 ? 'bg-cyan-500 border-cyan-500' : 'border-white/20 hover:bg-white/5'}`}>
+                <button type="button" onClick={() => setForm({...form, emailOrNumber: 1})}
+                  className={`flex-1 py-3 rounded-2xl border ${form.emailOrNumber === 1 ? 'bg-cyan-500 border-cyan-500' : 'border-white/20'}`}>
                   Email
                 </button>
-                <button type="button" onClick={() => handleContactMethod(0)}
-                  className={`flex-1 py-4 rounded-2xl border transition-all font-medium ${form.emailOrNumber === 0 ? 'bg-cyan-500 border-cyan-500' : 'border-white/20 hover:bg-white/5'}`}>
+                <button type="button" onClick={() => setForm({...form, emailOrNumber: 0})}
+                  className={`flex-1 py-3 rounded-2xl border ${form.emailOrNumber === 0 ? 'bg-cyan-500 border-cyan-500' : 'border-white/20'}`}>
                   Телефон
                 </button>
               </div>
             </div>
 
-            {/* Комментарий */}
-            <div>
-              <label className="block text-sm font-medium text-white/80 mb-2">Расскажите о вашей задаче</label>
-              <textarea name="comment" value={form.comment} onChange={handleChange} rows={6}
-                placeholder="Нужен современный сайт для интернет-магазина, интеграция с 1С..."
-                className="w-full bg-zinc-900 border border-white/10 focus:border-cyan-500 rounded-3xl px-6 py-5 text-lg placeholder:text-white/40 outline-none resize-y min-h-[140px] transition-all" required />
-            </div>
+            <textarea 
+              placeholder="Расскажите о вашей задаче..." rows={6}
+              value={form.comment} onChange={e => setForm({...form, comment: e.target.value})} required 
+            />
 
-            {submitError && <div className="text-red-400 text-sm bg-red-500/10 border border-red-500/30 px-5 py-3 rounded-2xl">{submitError}</div>}
+            {error && <p className="text-red-400">{error}</p>}
 
-            <button type="submit" disabled={submitting}
-              className="w-full py-5 bg-white hover:bg-cyan-400 active:bg-cyan-500 disabled:bg-white/70 text-zinc-950 font-semibold text-xl rounded-3xl transition-all flex items-center justify-center gap-3 active:scale-[0.985]">
-              {submitting ? (
-                <> <div className="w-5 h-5 border-2 border-zinc-950/30 border-t-zinc-950 rounded-full animate-spin" /> Отправляем заявку... </>
-              ) : 'Отправить заявку'}
+            <button 
+              type="submit" disabled={loading}
+              className="w-full py-5 bg-white text-black rounded-3xl font-bold text-xl disabled:opacity-70"
+            >
+              {loading ? 'Отправляем...' : 'Отправить заявку'}
             </button>
-
-            <p className="text-center text-xs text-white/50">Мы отвечаем в течение 1 часа в рабочее время.</p>
           </form>
         </div>
       </section>
-
-      <footer className="max-w-7xl mx-auto px-6 py-16 text-center text-white/60 text-sm">
-        Isait • Профессиональные IT-решения © {new Date().getFullYear()}
-      </footer>
     </div>
   )
 }

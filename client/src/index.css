@@ -2,137 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ==================== МАКСИМАЛЬНО ТЁМНЫЙ ПРЕМИУМ ДИЗАЙН ==================== */
-
-:root {
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
-
-/* Глубокий чёрный фон */
 html, body, #root {
   background-color: #050505;
   color: #ededed;
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
-/* Скроллбар */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #111111;
-}
-::-webkit-scrollbar-thumb {
-  background: #333333;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #555555;
-}
-
-/* ==================== ФОРМЫ ==================== */
-input, 
-textarea, 
-select {
-  background-color: #0f0f0f;
-  border: 1px solid #27272a;
+input, textarea {
+  background-color: #111111;
+  border: 1px solid #333333;
   color: #ededed;
-  transition: all 0.2s ease;
+  padding: 14px 18px;
+  border-radius: 12px;
+  width: 100%;
   font-size: 16px;
 }
 
-input:focus, 
-textarea:focus, 
-select:focus {
+input:focus, textarea:focus {
   border-color: #22d3ee;
-  box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.12);
-  background-color: #161616;
   outline: none;
 }
 
-/* Плейсхолдеры */
-::placeholder {
-  color: #666666;
-  opacity: 1;
-}
-
-/* ==================== КАРТОЧКИ И БЛОКИ ==================== */
-.bg-white\/5 {
-  background-color: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.group:hover {
-  background-color: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.1);
-  transform: translateY(-3px);
-  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
-}
-
-/* ==================== НАВБАР ==================== */
-nav {
-  background-color: rgba(5, 5, 5, 0.92);
-  backdrop-filter: blur(24px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-/* ==================== ФОРМА ЗАЯВКИ ==================== */
-form {
-  background-color: #0a0a0a;
-  border: 1px solid #27272a;
-  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
-}
-
-/* ==================== КНОПКИ ==================== */
 button {
-  transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
-  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
 button:hover {
   transform: translateY(-1px);
 }
 
-button:active {
-  transform: scale(0.985);
+.group {
+  transition: all 0.3s ease;
 }
 
-/* Главная кнопка формы */
-form button {
-  background-color: #ededed;
-  color: #050505;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-form button:hover {
-  background-color: #22d3ee;
-  color: #050505;
-}
-
-/* ==================== УСПЕХ / ОШИБКА ==================== */
-.bg-emerald-500\/10 {
-  background-color: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
-
-.text-red-400 {
-  color: #f87171;
-}
-
-/* ==================== ДРУГОЕ ==================== */
-.transition-all {
-  transition: all 0.3s cubic-bezier(0.23, 1.0, 0.32, 1);
-}
-
-/* Убираем любые белые оттенки */
-.bg-zinc-900 {
-  background-color: #0a0a0a !important;
-}
-
-.bg-zinc-950 {
-  background-color: #050505 !important;
+.group:hover {
+  transform: translateY(-4px);
 }
