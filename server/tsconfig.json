@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es2022",                          // Современный стандарт JavaScript
+    "module": "commonjs",                        // Стандартная модульная система для Node.js
+    "rootDir": "./src",                          // Где лежат ваши исходные файлы .ts
+    "outDir": "./dist",                          // Куда компилятор сложит готовый .js код
+    "esModuleInterop": true,                     // Позволяет нормально импортировать CommonJS либы
+    "forceConsistentCasingInFileNames": true,   // Защита от ошибок в регистре букв в путях
+    "strict": true,                              // Включение строгих проверок типов
+    "skipLibCheck": true                         // Пропускать проверку типов внутри node_modules
+  },
+  "include": ["src/**/*"]                        // Компилировать только файлы внутри папки src
+}

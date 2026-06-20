@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>IronSait — Админ Панель</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* ===== DYNAMIC BACKGROUND & GLASS ===== */
+    body {
+      background: radial-gradient(circle at 10% 20%, #0b1120 0%, #0f172a 90%);
+      color: #e2e8f0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      margin: 0;
+    }
+
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(71, 85, 105, 0.25);
+      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.6);
+    }
+
+    .card-dynamic {
+      background: linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(99, 179, 237, 0.15);
+      box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.7);
+      transition: all 0.25s ease;
+    }
+
+    .card-dynamic:hover {
+      border-color: rgba(56, 189, 248, 0.35);
+      box-shadow: 0 25px 45px -10px rgba(14, 165, 233, 0.2);
+      transform: translateY(-2px);
+    }
+
+    /* ===== BUTTONS & INTERACTIONS ===== */
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #1e40af);
+      border: 1px solid rgba(96, 165, 250, 0.4);
+      box-shadow: 0 10px 20px -8px rgba(37, 99, 235, 0.5);
+      transition: all 0.2s ease-in-out;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      box-shadow: 0 15px 25px -8px #2563eb80;
+      transform: scale(1.02);
+    }
+
+    .nav-item {
+      transition: all 0.2s ease;
+      border-left: 3px solid transparent;
+      border-radius: 12px;
+      margin-bottom: 6px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .nav-item:hover {
+      background: rgba(56, 189, 248, 0.1);
+      border-left: 3px solid #38bdf8;
+      padding-left: 20px;
+    }
+
+    /* ===== TABLE STYLING ===== */
+    .table-custom th {
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      color: #94a3b8;
+      background: rgba(15, 23, 42, 0.6);
+    }
+
+    .table-custom td {
+      border-bottom: 1px solid rgba(71, 85, 105, 0.25);
+      padding: 16px 8px;
+      vertical-align: middle;
+    }
+
+    .table-custom tr:last-child td {
+      border-bottom: none;
+    }
+
+    .delete-btn {
+      background: rgba(239, 68, 68, 0.1);
+      padding: 8px 16px;
+      border-radius: 30px;
+      color: #fecaca;
+      font-weight: 500;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .delete-btn:hover {
+      background: rgba(239, 68, 68, 0.3);
+      color: white;
+      border-color: #ef4444;
+    }
+
+    /* ===== CUSTOM SCROLLBAR ===== */
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 8px;
+    }
+
+    input, textarea {
+      transition: 0.2s ease;
+      border: 1px solid #334155;
+      outline: none;
+      background: #0f172a;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
+      background: #1e293b;
+    }
+
+    .badge-id {
+      background: #1e293b;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: #b9c7dd;
+    }
+
+    img.thumbnail {
+      border-radius: 14px;
+      box-shadow: 0 8px 14px rgba(0,0,0,0.5);
+      border: 1px solid #475569;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex">
+
+<!-- SIDEBAR MODERN GLASS -->
+<div class="w-72 glass-panel flex flex-col p-6 m-4 rounded-3xl shadow-2xl">
+  <div class="flex items-center gap-3 mb-12">
+    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+      <i class="fas fa-cube text-white text-xl"></i>
+    </div>
+    <h1 class="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">IRONSAIT</h1>
+  </div>
+
+  <nav class="flex flex-col gap-1 flex-1">
+    <button onclick="showTab(1)" class="nav-item w-full text-left px-5 py-3.5 rounded-xl flex items-center gap-3 text-slate-300 font-medium">
+      <i class="fas fa-tools w-5 text-blue-400"></i> Услуги
+    </button>
+    <button onclick="showTab(2)" class="nav-item w-full text-left px-5 py-3.5 rounded-xl flex items-center gap-3 text-slate-300 font-medium">
+      <i class="fas fa-images w-5 text-emerald-400"></i> Примеры работ
+    </button>
+    <button onclick="showTab(3)" class="nav-item w-full text-left px-5 py-3.5 rounded-xl flex items-center gap-3 text-slate-300 font-medium">
+      <i class="fas fa-clipboard-list w-5 text-amber-400"></i> Заявки
+    </button>
+  </nav>
+
+  <div class="mt-auto pt-6 border-t border-slate-700/50">
+    <a href="/logout" class="flex items-center gap-2 text-slate-400 hover:text-red-400 transition px-4 py-3 rounded-xl hover:bg-red-500/10">
+      <i class="fas fa-sign-out-alt"></i> <span>Выйти</span>
+    </a>
+  </div>
+</div>
+
+<!-- MAIN CONTENT AREA -->
+<div class="flex-1 p-6 ml-2 overflow-auto custom-scroll">
+  <div class="flex justify-between items-center mb-10 mt-2">
+    <div>
+      <h1 class="text-4xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">Админ Панель</h1>
+      <p class="text-slate-400 mt-1 text-sm">Управление контентом сайта</p>
+    </div>
+    <div class="bg-slate-800/60 px-5 py-3 rounded-2xl border border-slate-700/50">
+      <i class="far fa-user-circle text-blue-400 mr-2"></i>
+      <span class="text-slate-300 font-medium">Администратор</span>
+    </div>
+  </div>
+
+  <!-- TAB 1: УСЛУГИ -->
+  <div id="tab1" class="tab">
+    <div class="card-dynamic rounded-3xl p-7 mb-8">
+      <h2 class="text-2xl font-semibold flex items-center gap-3 mb-6">
+        <span class="w-8 h-8 bg-blue-600/30 rounded-lg flex items-center justify-center"><i class="fas fa-plus text-blue-300 text-sm"></i></span>
+        Добавить услугу
+      </h2>
+      <form id="serviceForm" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <input type="text" name="name" placeholder="Название услуги" class="bg-slate-900/80 p-4 rounded-xl text-white" required>
+        <textarea name="description" placeholder="Описание услуги" class="bg-slate-900/80 p-4 rounded-xl text-white" required></textarea>
+        <div class="flex flex-col gap-3">
+          <input type="file" name="image" accept="image/*" class="bg-slate-900/80 p-4 rounded-xl text-slate-300 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:bg-blue-600 file:text-white file:border-0">
+          <button type="submit" class="btn-primary py-4 rounded-xl font-bold text-white flex items-center justify-center gap-2">
+            <i class="fas fa-save"></i> Добавить
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="card-dynamic rounded-3xl p-7" id="servicesList">
+      <div class="text-slate-400 text-center py-10">Загрузка услуг...</div>
+    </div>
+  </div>
+
+  <!-- TAB 2: ПРИМЕРЫ -->
+  <div id="tab2" class="tab hidden">
+    <div class="card-dynamic rounded-3xl p-7 mb-8">
+      <h2 class="text-2xl font-semibold flex items-center gap-3 mb-6">
+        <span class="w-8 h-8 bg-emerald-600/30 rounded-lg flex items-center justify-center"><i class="fas fa-image text-emerald-300 text-sm"></i></span>
+        Добавить пример работы
+      </h2>
+      <form id="exampleForm" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <textarea name="description" placeholder="Описание примера" class="bg-slate-900/80 p-4 rounded-xl text-white" required></textarea>
+        <div class="flex flex-col gap-3">
+          <input type="file" name="image" accept="image/*" class="bg-slate-900/80 p-4 rounded-xl text-slate-300 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:bg-emerald-600 file:text-white file:border-0">
+          <button type="submit" class="btn-primary py-4 rounded-xl font-bold text-white flex items-center justify-center gap-2" style="background:linear-gradient(135deg,#059669,#047857);">
+            <i class="fas fa-cloud-upload-alt"></i> Добавить
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="card-dynamic rounded-3xl p-7" id="examplesList">
+      <div class="text-slate-400 text-center py-10">Загрузка примеров...</div>
+    </div>
+  </div>
+
+  <!-- TAB 3: ЗАЯВКИ -->
+  <div id="tab3" class="tab hidden">
+    <div class="card-dynamic rounded-3xl p-7" id="bidsList">
+      <div class="text-slate-400 text-center py-10">Загрузка заявок...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showTab(n) {
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
+    document.getElementById('tab' + n).classList.remove('hidden');
+  }
+
+  async function loadData() {
+    try {
+      const [services, examples, bids] = await Promise.all([
+        fetch('/services').then(r => r.json()),
+        fetch('/examples').then(r => r.json()),
+        fetch('/bids').then(r => r.json())
+      ]);
+      renderServices(services);
+      renderExamples(examples);
+      renderBids(bids);
+    } catch (err) {
+      console.error('Ошибка загрузки данных:', err);
+    }
+  }
+
+  function renderServices(data) {
+    let html = `<table class="w-full table-custom"><thead><tr><th class="text-left py-4 pl-2">ID</th><th>Название</th><th>Описание</th><th>Фото</th><th class="text-center">Действия</th></tr></thead><tbody>`;
+    data.forEach(item => {
+      html += `
+                <tr>
+                    <td class="py-4"><span class="badge-id">#${item.id}</span></td>
+                    <td class="font-medium text-white">${item.name || '—'}</td>
+                    <td class="text-slate-400 max-w-[200px] truncate">${item.description || '—'}</td>
+                    <td><img src="${item.imgLink}" class="thumbnail h-14 w-14 object-cover" alt="img"></td>
+                    <td class="text-center">
+                        <button onclick="deleteItem('service', ${item.id})" class="delete-btn"><i class="fas fa-trash-alt"></i> Удалить</button>
+                    </td>
+                </tr>`;
+    });
+    html += `</tbody></table>`;
+    document.getElementById('servicesList').innerHTML = html;
+  }
+
+  function renderExamples(data) {
+    let html = `<table class="w-full table-custom"><thead><tr><th class="text-left py-4 pl-2">ID</th><th>Описание</th><th>Фото</th><th class="text-center">Действия</th></tr></thead><tbody>`;
+    data.forEach(item => {
+      html += `
+                <tr>
+                    <td class="py-4"><span class="badge-id">#${item.id}</span></td>
+                    <td class="text-slate-300">${item.description || '—'}</td>
+                    <td><img src="${item.imgLink}" class="thumbnail h-14 w-14 object-cover" alt="example"></td>
+                    <td class="text-center">
+                        <button onclick="deleteItem('example', ${item.id})" class="delete-btn"><i class="fas fa-trash-alt"></i> Удалить</button>
+                    </td>
+                </tr>`;
+    });
+    html += `</tbody></table>`;
+    document.getElementById('examplesList').innerHTML = html;
+  }
+
+  function renderBids(data) {
+    let html = `<table class="w-full table-custom"><thead><tr><th>ID</th><th>Имя</th><th>Контакт</th><th>Комментарий</th><th class="text-center">Действия</th></tr></thead><tbody>`;
+    data.forEach(item => {
+      html += `
+                <tr>
+                    <td><span class="badge-id">#${item.id}</span></td>
+                    <td class="font-medium">${item.name || '—'}</td>
+                    <td class="text-blue-300">${item.email || item.number || '—'}</td>
+                    <td class="text-slate-400 max-w-[180px] truncate">${item.comment || '—'}</td>
+                    <td class="text-center">
+                        <button onclick="deleteItem('bid', ${item.id})" class="delete-btn"><i class="fas fa-trash-alt"></i> Удалить</button>
+                    </td>
+                </tr>`;
+    });
+    html += `</tbody></table>`;
+    document.getElementById('bidsList').innerHTML = html;
+  }
+
+  async function deleteItem(type, id) {
+    if (confirm(`Удалить запись #${id}?`)) {
+      try {
+        await fetch(`/admin/${type}/${id}`, { method: 'DELETE' });
+        loadData();
+      } catch (err) {
+        console.error('Ошибка удаления:', err);
+      }
+    }
+  }
+
+  document.getElementById('serviceForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const form = new FormData(e.target);
+    try {
+      await fetch('/admin/service', { method: 'POST', body: form });
+      e.target.reset();
+      loadData();
+    } catch (err) {
+      console.error('Ошибка добавления услуги:', err);
+    }
+  };
+
+  document.getElementById('exampleForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const form = new FormData(e.target);
+    try {
+      await fetch('/admin/example', { method: 'POST', body: form });
+      e.target.reset();
+      loadData();
+    } catch (err) {
+      console.error('Ошибка добавления примера:', err);
+    }
+  };
+
+  loadData();
+</script>
+</body>
+</html>
