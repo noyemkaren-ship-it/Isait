@@ -15,7 +15,7 @@ interface FormData {
   emailOrNumber: number
 }
 
-const API = 'http://46.253.132.225:5000'
+const API = 'http://46.253.132.225:3000'
 
 function App() {
   const [services, setServices] = useState<Service[]>([])
