@@ -1,12 +1,10 @@
 import crypto from "crypto";
+import { SECRET_KEY } from "./key";
 
 const ALGORITHM = 'aes-256-gcm';
 
 // Фиксированный ключ ровно 32 байта
-const SECRET_KEY = Buffer.from(
-  'mySuperSecretKey1234567890ABCDEF', // ← ровно 32 символа
-  'utf8'
-);
+
 
 /**
  * Зашифровать строку

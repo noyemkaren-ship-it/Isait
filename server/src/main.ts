@@ -69,7 +69,7 @@ app.get("/admin/panel", (req: Request, res: Response) => {
 app.get("/logout", (req, res) => {
   res.clearCookie('role');
   res.redirect("/login/worker");
-  writeToFile("log.txt", "Успешный вход на /logout")
+  writeToFile("log.txt", "Успешный вход на /logout");
 });
 
 app.use(router)
