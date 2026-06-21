@@ -44,7 +44,7 @@ app.post("/login", (req: Request, res: Response) => {
       sameSite: "strict"
     });
     print("✅ Успешный вход администратора");
-    writeToFile("log.txt", "Успешный вход на /login")
+    writeToFile("log.txt", " Успешный вход на /login")
     return res.redirect("/admin/panel");
   }
   print("❌ Неверный логин или пароль");
@@ -56,8 +56,9 @@ app.get("/admin/panel", (req: Request, res: Response) => {
     const role = decrypt(req.cookies.role);
     if (role === "admin") {
       const html = eta.render("./index.eta", { name: "Карен" });
+      writeToFile("log.txt", " Вход на /admin/panel")
       return res.send(html);
-      writeToFile("log.txt", "Вход на /admin/panel")
+      
     }
   } catch (e) {
     console.error("Auth error:", e);
