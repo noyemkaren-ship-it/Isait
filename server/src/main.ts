@@ -6,7 +6,7 @@ import { encrypt, decrypt } from "./auth/token";
 import cookieParser from 'cookie-parser';
 import router from "./router/router";
 import cors from "cors";
-
+import { writeToFile } from "./log/file_log";
 
 const app = express();
 
@@ -44,6 +44,7 @@ app.post("/login", (req: Request, res: Response) => {
       sameSite: "strict"
     });
     print("✅ Успешный вход администратора");
+    writeToFile("log.txt", "Успешный вход на /login")
     return res.redirect("/admin/panel");
   }
   print("❌ Неверный логин или пароль");
@@ -56,6 +57,7 @@ app.get("/admin/panel", (req: Request, res: Response) => {
     if (role === "admin") {
       const html = eta.render("./index.eta", { name: "Карен" });
       return res.send(html);
+      writeToFile("log.txt", "Вход на /admin/panel")
     }
   } catch (e) {
     console.error("Auth error:", e);
@@ -66,6 +68,7 @@ app.get("/admin/panel", (req: Request, res: Response) => {
 app.get("/logout", (req, res) => {
   res.clearCookie('role');
   res.redirect("/login/worker");
+  writeToFile("log.txt", "Успешный вход на /logout")
 });
 
 app.use(router)
