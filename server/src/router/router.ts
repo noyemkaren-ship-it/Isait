@@ -7,6 +7,8 @@ import { decrypt } from "../auth/token";
 import { eq } from "drizzle-orm";
 import multer from "multer";
 import path from "path";
+import { writeToFile } from "../log/file_log";
+
 
 const router = Router();
 
@@ -57,9 +59,11 @@ router.post("/admin/service", requireAdmin, upload.single('image'), async (req: 
     const result = await db.insert(service).values({ name, description, imgLink }).returning();
     print("✅ Услуга добавлена");
     res.status(201).json(result[0]);
+    writeToFile("db_log.txt", "SUCESS /admin/service")
   } catch (err: any) {
     console.error(err);
     res.status(400).json({ error: err.message });
+    writeToFile("db_log.txt", "NOT SUCESS /admin/service")
   }
 });
 
@@ -87,8 +91,10 @@ router.post("/admin/example", requireAdmin, upload.single('image'), async (req: 
     const result = await db.insert(example).values({ description, imgLink }).returning();
     print("✅ Пример добавлен");
     res.status(201).json(result[0]);
+    writeToFile("db_log.txt", "SUCESS /admin/example")
   } catch (err: any) {
     res.status(400).json({ error: err.message });
+    writeToFile("db_log.txt", "NOT SUCESS /admin/example")
   }
 });
 
@@ -108,8 +114,12 @@ router.post("/bid", async (req: Request, res: Response) => {
   try {
     const result = await db.insert(bid).values(req.body).returning();
     res.status(201).json(result[0]);
+
+    writeToFile("db_log.txt", "SUCESS /admin/bid")
   } catch (err: any) {
     res.status(400).json({ error: err.message });
+
+    writeToFile("db_log.txt", "NOT SUCESS /admin/bid")
   }
 });
 

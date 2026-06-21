@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import router from "./router/router";
 import cors from "cors";
 import { writeToFile } from "./log/file_log";
+import fs from "fs";
 
 const app = express();
 
@@ -66,7 +67,39 @@ app.get("/admin/panel", (req: Request, res: Response) => {
   res.redirect("/login/worker");
 });
 
-app.get("/logout", (req, res) => {
+
+app.get('/admin/monitor', (req: Request, res: Response) => {
+    try {
+        const role = decrypt(req.cookies.role);
+        
+        if (role === 'admin') { 
+            // Умный поиск файла в двух местах
+            const paths = [
+                path.join(__dirname, '..', 'db_log.txt'),  // server/db_log.txt
+                path.join(__dirname, 'db_log.txt'),         // server/src/db_log.txt
+            ];
+            
+            let filePath = paths.find(p => fs.existsSync(p)) || '';
+            let content = 'Файл не найден';
+            
+            if (filePath) {
+                content = fs.readFileSync(filePath, 'utf-8');
+            }
+            
+            const html = eta.render('./monitor.eta', { logs: content });
+            writeToFile('log.txt', 'Вход на /admin/monitor');
+            return res.send(html);
+        } else {
+            return res.redirect('/login/worker');
+        }
+    } catch (e) {
+        console.error('Auth error:', e);
+        const html = eta.render('./monitor.eta', { logs: 'Ошибка: '});
+        return res.send(html);
+    }
+});
+
+app.get("/logout", (req: Request, res: Response) => {
   res.clearCookie('role');
   res.redirect("/login/worker");
   writeToFile("log.txt", "Успешный вход на /logout");
