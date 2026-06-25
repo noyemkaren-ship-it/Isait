@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import Product from './products.tsx'
 
 interface Service {
   id: number
@@ -30,6 +31,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
+  const [nottap, istap] = useState(false)
 
   useEffect(() => {
     fetch('/services').then(res => res.json()).then(setServices).catch(console.error)
@@ -59,13 +61,6 @@ function App() {
     }
   }
 
-  // ============================================
-  // SEO: ДИНАМИЧЕСКАЯ СТРУКТУРИРОВАННАЯ РАЗМЕТКА SCHEMA.ORG
-  // Это КЛЮЧЕВОЙ момент для Google! 
-  // Google будет точно понимать, что вы — IT-компания, какие услуги предлагаете,
-  // и сможет показывать расширенные сниппеты (rich results) в поиске.
-  // Это сильно помогает ранжироваться выше конкурентов.
-  // ============================================
   const jsonLdSchema = {
     "@context": "https://schema.org",
     "@graph": [
@@ -339,6 +334,19 @@ function App() {
                 </button>
               </form>
             </div>
+            <div>
+              <button
+                onClick={() => {
+                  istap(true)
+                }}
+                className="submit-btn"
+                
+                aria-label="Узнать о продуктах"
+              >
+                Узнать о продуктах
+              </button>
+              {nottap && <div className="submit-btn"><button onClick={() => istap(false)} className="btn btn-secondary" aria-label="Закрыть информацию о продуктах">Закрыть</button><Product /></div>}
+            </div>
           </section>
         </main>
 
@@ -360,5 +368,4 @@ function App() {
     </>
   )
 }
-
 export default App
