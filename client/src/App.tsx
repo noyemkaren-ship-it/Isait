@@ -22,7 +22,6 @@ interface FormData {
   emailOrNumber: number
 }
 
-// 👇 БАЗОВЫЙ URL БЭКЕНДА
 const API_BASE = 'http://46.253.132.225:3000'
 
 function App() {
@@ -37,7 +36,6 @@ function App() {
   const [nottap, istap] = useState(false)
 
   useEffect(() => {
-    // 👇 ВСЕ ЗАПРОСЫ ИДУТ НА ПОРТ 3000
     fetch(`${API_BASE}/services`)
       .then(res => res.json())
       .then(setServices)
@@ -55,7 +53,6 @@ function App() {
     setSuccess(false)
     setLoading(true)
     try {
-      // 👇 И ЭТОТ ЗАПРОС НА 3000
       const res = await fetch(`${API_BASE}/bid`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -97,7 +94,7 @@ function App() {
               "@type": "Organization",
               "name": "Isait"
             },
-            ...(service.imgLink && { "image": service.imgLink })
+            ...(service.imgLink && { "image": `${API_BASE}${service.imgLink}` })
           }))
         : [])
     ]
@@ -162,7 +159,7 @@ function App() {
                   <div key={s.id} className="service-card">
                     {s.imgLink && (
                       <img 
-                        src={s.imgLink} 
+                        src={`${API_BASE}${s.imgLink}`}
                         alt={`${s.name} — профессиональная IT-услуга для бизнеса`} 
                         className="service-img" 
                         loading="lazy"
@@ -193,7 +190,7 @@ function App() {
                     <div key={ex.id} className="service-card">
                       {ex.imgLink && (
                         <img 
-                          src={ex.imgLink} 
+                          src={`${API_BASE}${ex.imgLink}`}
                           alt={`Пример реализованного проекта: ${ex.description ? ex.description.substring(0, 80) : 'IT-решение для бизнеса'}`} 
                           className="service-img" 
                           loading="lazy"
