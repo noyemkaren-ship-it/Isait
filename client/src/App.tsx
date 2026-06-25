@@ -22,6 +22,9 @@ interface FormData {
   emailOrNumber: number
 }
 
+// 👇 БАЗОВЫЙ URL БЭКЕНДА
+const API_BASE = 'http://46.253.132.225:3000'
+
 function App() {
   const [services, setServices] = useState<Service[]>([])
   const [examples, setExamples] = useState<Example[]>([])
@@ -34,8 +37,16 @@ function App() {
   const [nottap, istap] = useState(false)
 
   useEffect(() => {
-    fetch('/services').then(res => res.json()).then(setServices).catch(console.error)
-    fetch('/examples').then(res => res.json()).then(setExamples).catch(console.error)
+    // 👇 ВСЕ ЗАПРОСЫ ИДУТ НА ПОРТ 3000
+    fetch(`${API_BASE}/services`)
+      .then(res => res.json())
+      .then(setServices)
+      .catch(console.error)
+    
+    fetch(`${API_BASE}/examples`)
+      .then(res => res.json())
+      .then(setExamples)
+      .catch(console.error)
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,7 +55,8 @@ function App() {
     setSuccess(false)
     setLoading(true)
     try {
-      const res = await fetch('/bid', {
+      // 👇 И ЭТОТ ЗАПРОС НА 3000
+      const res = await fetch(`${API_BASE}/bid`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
@@ -68,7 +80,7 @@ function App() {
         "@type": "Organization",
         "name": "Isait",
         "url": typeof window !== 'undefined' ? window.location.origin : "https://isait.ru",
-        "logo": "https://isait.ru/logo.png", // ← ЗАМЕНИ НА РЕАЛЬНЫЙ URL ЛОГОТИПА
+        "logo": "https://isait.ru/logo.png",
         "description": "Профессиональные IT-решения премиум уровня. Разрабатываем современные веб-сервисы и помогаем компаниям расти с помощью технологий и автоматизации бизнеса.",
         "contactPoint": {
           "@type": "ContactPoint",
@@ -76,7 +88,6 @@ function App() {
           "availableLanguage": ["ru", "Russian"]
         }
       },
-      // Динамически добавляем все услуги из API — Google увидит каждую услугу отдельно
       ...(services.length > 0 
         ? services.map((service) => ({
             "@type": "Service",
@@ -94,18 +105,12 @@ function App() {
 
   return (
     <>
-      {/* 
-        SEO: Структурированные данные JSON-LD 
-        ВАЖНО: Размещаем в самом начале — Google парсит это в первую очередь.
-        Это даёт огромное преимущество в поиске по сравнению с обычными сайтами без Schema.
-      */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSchema) }}
       />
 
       <div>
-        {/* Navbar — semantic header + nav */}
         <header className="navbar">
           <nav className="navbar-content" aria-label="Основная навигация сайта">
             <div className="logo">
@@ -122,9 +127,7 @@ function App() {
           </nav>
         </header>
 
-        {/* Главный контент страницы — semantic main */}
         <main>
-          {/* Hero Section */}
           <section className="hero" aria-labelledby="hero-title">
             <div className="hero-badge">IT-РЕШЕНИЯ ПРЕМИУМ УРОВНЯ</div>
             <h1 id="hero-title" className="hero-title">
@@ -151,7 +154,6 @@ function App() {
             </div>
           </section>
 
-          {/* Услуги — semantic section с правильным heading */}
           <section id="services" className="services" aria-labelledby="services-title">
             <h2 id="services-title" className="section-title">Наши услуги</h2>
             <div className="services-grid">
@@ -178,7 +180,6 @@ function App() {
             </div>
           </section>
 
-          {/* Примеры работ */}
           <section 
             id="examples" 
             className="services bg-[#0a0a0a] py-16 border-y border-white/10" 
@@ -210,7 +211,6 @@ function App() {
             </div>
           </section>
 
-          {/* Форма заявки — semantic section + accessible form */}
           <section id="form" className="form-section" aria-labelledby="form-title">
             <div className="form-container">
               <div className="form-header">
@@ -227,7 +227,6 @@ function App() {
               )}
 
               <form onSubmit={handleSubmit} className="form" noValidate>
-                {/* Имя */}
                 <div>
                   <label htmlFor="name" className="sr-only">Ваше имя</label>
                   <input 
@@ -243,7 +242,6 @@ function App() {
                   />
                 </div>
 
-                {/* Email + Телефон в ряд */}
                 <div className="input-row">
                   <div>
                     <label htmlFor="email" className="sr-only">Email</label>
@@ -275,7 +273,6 @@ function App() {
                   </div>
                 </div>
 
-                {/* Способ связи — accessible radiogroup */}
                 <div 
                   className="contact-method" 
                   role="radiogroup" 
@@ -308,7 +305,6 @@ function App() {
                   </div>
                 </div>
 
-                {/* Комментарий */}
                 <div>
                   <label htmlFor="comment" className="sr-only">Расскажите о вашей задаче</label>
                   <textarea 
@@ -340,7 +336,6 @@ function App() {
                   istap(true)
                 }}
                 className="submit-btn"
-                
                 aria-label="Узнать о продуктах"
               >
                 Узнать о продуктах
@@ -350,7 +345,6 @@ function App() {
           </section>
         </main>
 
-        {/* Footer — semantic footer с ключевыми словами для SEO */}
         <footer className="footer">
           <div className="max-w-6xl mx-auto px-6 py-12 text-center text-sm text-white/60">
             <p>© {new Date().getFullYear()} Isait. Все права защищены.</p>
