@@ -22,11 +22,6 @@ interface FormData {
   emailOrNumber: number
 }
 
-// 👇 БАЗОВЫЙ URL ДЛЯ КАРТИНОК (через Nginx)
-const IMAGE_BASE = '' // Пусто, потому что Nginx проксирует /uploads/
-// Если через прямой доступ к бэкенду:
-// const IMAGE_BASE = 'http://46.253.132.225:3000'
-
 function App() {
   const [services, setServices] = useState<Service[]>([])
   const [examples, setExamples] = useState<Example[]>([])
@@ -66,16 +61,12 @@ function App() {
     }
   }
 
-  // 👇 Функция для правильного формирования URL картинки
+  // Функция для правильного формирования URL картинки
   const getImageUrl = (path: string) => {
     if (!path) return ''
-    // Если путь уже полный (http://...) — возвращаем как есть
     if (path.startsWith('http://') || path.startsWith('https://')) return path
-    // Если путь начинается с /uploads/ — оставляем как есть (Nginx проксирует)
     if (path.startsWith('/uploads/')) return path
-    // Если путь просто uploads/ — добавляем /
     if (path.startsWith('uploads/')) return `/${path}`
-    // Иначе добавляем /uploads/ в начало
     return `/uploads/${path}`
   }
 
