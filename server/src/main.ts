@@ -41,7 +41,7 @@ app.get("/login/worker", (req: Request, res: Response) => {
   res.send(html);
 });
 
-app.post("/login", (req: Request, res: Response) => {
+app.post("/admin/login", (req: Request, res: Response) => {
   const { username, password } = req.body;
   if (username === "admin" && password === "1asdasd-asdasdasd=asdadsad") {
     res.cookie('role', encrypt("admin"), {
