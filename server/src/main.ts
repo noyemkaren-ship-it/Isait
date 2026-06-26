@@ -44,7 +44,6 @@ app.post("/login", (req: Request, res: Response) => {
     res.cookie('role', encrypt("admin"), {
       maxAge: 24 * 60 * 60 * 1000,
       httpOnly: true,
-      secure: true, // 👈 МЕНЯЕМ НА TRUE ДЛЯ HTTPS
       sameSite: "strict"
     });
     print("✅ Успешный вход администратора");
