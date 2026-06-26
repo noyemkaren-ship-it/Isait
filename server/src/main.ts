@@ -46,7 +46,6 @@ app.post("/login", (req: Request, res: Response) => {
       httpOnly: true,
       sameSite: "strict",
       path: "/",
-      domain: ".isait.ru"
     });
     print("✅ Успешный вход администратора");
     writeToFile("log.txt", " Успешный вход на /login")
