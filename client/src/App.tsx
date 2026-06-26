@@ -22,9 +22,6 @@ interface FormData {
   emailOrNumber: number
 }
 
-// 👇 ПРЯМОЙ URL К БЭКЕНДУ ДЛЯ КАРТИНОК
-const API_BASE = 'http://46.253.132.225:3000'
-
 function App() {
   const [services, setServices] = useState<Service[]>([])
   const [examples, setExamples] = useState<Example[]>([])
@@ -64,13 +61,17 @@ function App() {
     }
   }
 
-  // 👇 Функция для правильного формирования URL картинки
+  // 👇 Функция для правильного формирования URL картинки (через Nginx)
   const getImageUrl = (path: string) => {
     if (!path) return ''
     // Если путь уже полный — возвращаем как есть
     if (path.startsWith('http://') || path.startsWith('https://')) return path
-    // Добавляем базовый URL бэкенда
-    return `${API_BASE}${path.startsWith('/') ? '' : '/'}${path}`
+    // Если путь начинается с /uploads/ — оставляем (Nginx проксирует)
+    if (path.startsWith('/uploads/')) return path
+    // Если путь начинается с uploads/ — добавляем /
+    if (path.startsWith('uploads/')) return `/${path}`
+    // Иначе добавляем /uploads/
+    return `/uploads/${path}`
   }
 
   const jsonLdSchema = {
