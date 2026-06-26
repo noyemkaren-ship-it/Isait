@@ -8,7 +8,7 @@ import router from "./router/router";
 import cors from "cors";
 import { writeToFile } from "./log/file_log";
 import fs from "fs";
-import https from "https"; // 👈 ДОБАВЛЯЕМ HTTPS
+import https from "https";
 
 const app = express();
 
@@ -17,13 +17,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
+// ИСПРАВЛЕННЫЙ CORS - ДОБАВЛЕН ПОРТ 3000
 app.use(cors({
   origin: [
     'http://46.253.132.225:8000',
     'http://46.253.132.225',
+    'http://46.253.132.225:3000',      // ← ДОБАВИЛ
     'http://localhost:8000',
-    'https://isaitff.ru', // 👈 ДОБАВЛЯЕМ HTTPS
-    'https://www.isaitff.ru' // 👈 ДОБАВЛЯЕМ HTTPS
+    'http://localhost:3000',            // ← ДОБАВИЛ
+    'https://isaitff.ru',
+    'https://www.isaitff.ru'
   ],
   credentials: true
 }))
@@ -44,7 +47,7 @@ app.post("/login", (req: Request, res: Response) => {
     res.cookie('role', encrypt("admin"), {
       maxAge: 24 * 60 * 60 * 1000,
       httpOnly: true,
-      sameSite: "strict",
+      sameSite: "lax",              // ← ИСПРАВИЛ НА lax
       path: "/",
     });
     print("✅ Успешный вход администратора");
