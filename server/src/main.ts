@@ -8,6 +8,7 @@ import router from "./router/router";
 import cors from "cors";
 import { writeToFile } from "./log/file_log";
 import fs from "fs";
+import https from "https"; // 👈 ДОБАВЛЯЕМ HTTPS
 
 const app = express();
 
@@ -20,7 +21,9 @@ app.use(cors({
   origin: [
     'http://46.253.132.225:8000',
     'http://46.253.132.225',
-    'http://localhost:8000'
+    'http://localhost:8000',
+    'https://isaitff.ru', // 👈 ДОБАВЛЯЕМ HTTPS
+    'https://www.isaitff.ru' // 👈 ДОБАВЛЯЕМ HTTPS
   ],
   credentials: true
 }))
@@ -41,7 +44,7 @@ app.post("/login", (req: Request, res: Response) => {
     res.cookie('role', encrypt("admin"), {
       maxAge: 24 * 60 * 60 * 1000,
       httpOnly: true,
-      secure: false,
+      secure: true, // 👈 МЕНЯЕМ НА TRUE ДЛЯ HTTPS
       sameSite: "strict"
     });
     print("✅ Успешный вход администратора");
@@ -73,10 +76,9 @@ app.get('/admin/monitor', (req: Request, res: Response) => {
         const role = decrypt(req.cookies.role);
         
         if (role === 'admin') { 
-            // Умный поиск файла в двух местах
             const paths = [
-                path.join(__dirname, '..', 'db_log.txt'),  // server/db_log.txt
-                path.join(__dirname, 'db_log.txt'),         // server/src/db_log.txt
+                path.join(__dirname, '..', 'db_log.txt'),
+                path.join(__dirname, 'db_log.txt'),
             ];
             
             let filePath = paths.find(p => fs.existsSync(p)) || '';
@@ -106,6 +108,16 @@ app.get("/logout", (req: Request, res: Response) => {
 });
 
 app.use(router)
+
+const httpsOptions = {
+  key: fs.readFileSync(path.join(__dirname, '../key.pem')),
+  cert: fs.readFileSync(path.join(__dirname, '../cert.pem'))
+};
+
+https.createServer(httpsOptions, app).listen(3443, () => {
+  console.log("🚀 HTTPS СЕРВЕР ЗАПУЩЕН → https://46.253.132.225:3443");
+});
+
 app.listen(3000, () => {
-  console.log("🚀 СЕРВЕР ЗАПУЩЕН → http://localhost:3000/login/worker");
+  console.log("🚀 HTTP СЕРВЕР ЗАПУЩЕН → http://localhost:3000");
 });
