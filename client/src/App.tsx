@@ -61,12 +61,12 @@ function App() {
     }
   }
 
-  // 👇 Функция для правильного формирования URL картинки (через Nginx)
+  // 👇 ФУНКЦИЯ ДЛЯ КАРТИНОК — ПРОСТО ВОЗВРАЩАЕТ ПУТЬ
   const getImageUrl = (path: string) => {
     if (!path) return ''
     // Если путь уже полный — возвращаем как есть
     if (path.startsWith('http://') || path.startsWith('https://')) return path
-    // Если путь начинается с /uploads/ — оставляем (Nginx проксирует)
+    // Если путь начинается с /uploads/ — оставляем
     if (path.startsWith('/uploads/')) return path
     // Если путь начинается с uploads/ — добавляем /
     if (path.startsWith('uploads/')) return `/${path}`
