@@ -22,8 +22,6 @@ interface FormData {
   emailOrNumber: number
 }
 
-const API_BASE = 'http://46.253.132.225:3000'
-
 function App() {
   const [services, setServices] = useState<Service[]>([])
   const [examples, setExamples] = useState<Example[]>([])
@@ -36,15 +34,9 @@ function App() {
   const [nottap, istap] = useState(false)
 
   useEffect(() => {
-    fetch(`${API_BASE}/services`)
-      .then(res => res.json())
-      .then(setServices)
-      .catch(console.error)
-    
-    fetch(`${API_BASE}/examples`)
-      .then(res => res.json())
-      .then(setExamples)
-      .catch(console.error)
+    // 👇 Запросы идут через Nginx (прокси на порт 3000)
+    fetch('/admin/services').then(res => res.json()).then(setServices).catch(console.error)
+    fetch('/admin/examples').then(res => res.json()).then(setExamples).catch(console.error)
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -53,7 +45,8 @@ function App() {
     setSuccess(false)
     setLoading(true)
     try {
-      const res = await fetch(`${API_BASE}/bid`, {
+      // 👇 Запрос на отправку заявки через Nginx
+      const res = await fetch('/admin/bid', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
@@ -94,7 +87,7 @@ function App() {
               "@type": "Organization",
               "name": "Isait"
             },
-            ...(service.imgLink && { "image": `${API_BASE}${service.imgLink}` })
+            ...(service.imgLink && { "image": service.imgLink })
           }))
         : [])
     ]
@@ -159,7 +152,7 @@ function App() {
                   <div key={s.id} className="service-card">
                     {s.imgLink && (
                       <img 
-                        src={`${API_BASE}${s.imgLink}`}
+                        src={s.imgLink}
                         alt={`${s.name} — профессиональная IT-услуга для бизнеса`} 
                         className="service-img" 
                         loading="lazy"
@@ -190,7 +183,7 @@ function App() {
                     <div key={ex.id} className="service-card">
                       {ex.imgLink && (
                         <img 
-                          src={`${API_BASE}${ex.imgLink}`}
+                          src={ex.imgLink}
                           alt={`Пример реализованного проекта: ${ex.description ? ex.description.substring(0, 80) : 'IT-решение для бизнеса'}`} 
                           className="service-img" 
                           loading="lazy"
