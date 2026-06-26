@@ -3,11 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>IronSait — Админ Панель</title>
+  <title>IRONSAIT — Админ Панель</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    /* ===== DYNAMIC BACKGROUND & GLASS ===== */
     body {
       background: radial-gradient(circle at 10% 20%, #0b1120 0%, #0f172a 90%);
       color: #e2e8f0;
@@ -38,7 +37,6 @@
       transform: translateY(-2px);
     }
 
-    /* ===== BUTTONS & INTERACTIONS ===== */
     .btn-primary {
       background: linear-gradient(135deg, #2563eb, #1e40af);
       border: 1px solid rgba(96, 165, 250, 0.4);
@@ -67,7 +65,6 @@
       padding-left: 20px;
     }
 
-    /* ===== TABLE STYLING ===== */
     .table-custom th {
       font-weight: 500;
       letter-spacing: 0.5px;
@@ -104,7 +101,6 @@
       border-color: #ef4444;
     }
 
-    /* ===== CUSTOM SCROLLBAR ===== */
     .custom-scroll::-webkit-scrollbar {
       width: 6px;
     }
@@ -141,12 +137,15 @@
       border-radius: 14px;
       box-shadow: 0 8px 14px rgba(0,0,0,0.5);
       border: 1px solid #475569;
+      width: 56px;
+      height: 56px;
+      object-fit: cover;
     }
   </style>
 </head>
 <body class="min-h-screen flex">
 
-<!-- SIDEBAR MODERN GLASS -->
+<!-- SIDEBAR -->
 <div class="w-72 glass-panel flex flex-col p-6 m-4 rounded-3xl shadow-2xl">
   <div class="flex items-center gap-3 mb-12">
     <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
@@ -165,6 +164,9 @@
     <button onclick="showTab(3)" class="nav-item w-full text-left px-5 py-3.5 rounded-xl flex items-center gap-3 text-slate-300 font-medium">
       <i class="fas fa-clipboard-list w-5 text-amber-400"></i> Заявки
     </button>
+    <button onclick="showTab(4)" class="nav-item w-full text-left px-5 py-3.5 rounded-xl flex items-center gap-3 text-slate-300 font-medium">
+      <i class="fas fa-chart-line w-5 text-rose-400"></i> Мониторинг
+    </button>
   </nav>
 
   <div class="mt-auto pt-6 border-t border-slate-700/50">
@@ -174,7 +176,7 @@
   </div>
 </div>
 
-<!-- MAIN CONTENT AREA -->
+<!-- MAIN CONTENT -->
 <div class="flex-1 p-6 ml-2 overflow-auto custom-scroll">
   <div class="flex justify-between items-center mb-10 mt-2">
     <div>
@@ -238,20 +240,43 @@
       <div class="text-slate-400 text-center py-10">Загрузка заявок...</div>
     </div>
   </div>
+
+  <!-- TAB 4: МОНИТОРИНГ -->
+  <div id="tab4" class="tab hidden">
+    <div class="card-dynamic rounded-3xl p-7">
+      <h2 class="text-2xl font-semibold flex items-center gap-3 mb-6">
+        <span class="w-8 h-8 bg-rose-600/30 rounded-lg flex items-center justify-center"><i class="fas fa-terminal text-rose-300 text-sm"></i></span>
+        Логи системы
+      </h2>
+      <div id="monitorLogs" class="bg-slate-900/80 rounded-2xl p-5 font-mono text-sm text-slate-300 overflow-auto max-h-96 custom-scroll whitespace-pre-wrap">
+        Загрузка логов...
+      </div>
+      <div class="mt-4 flex gap-3">
+        <button onclick="loadMonitor()" class="bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 px-5 py-2 rounded-xl border border-blue-600/30 transition">
+          <i class="fas fa-sync-alt"></i> Обновить
+        </button>
+        <a href="/admin/monitor" target="_blank" class="bg-slate-700/30 hover:bg-slate-700/50 text-slate-300 px-5 py-2 rounded-xl border border-slate-600/30 transition">
+          <i class="fas fa-external-link-alt"></i> Открыть отдельно
+        </a>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
+  // ===== ПОКАЗ ВКЛАДКИ =====
   function showTab(n) {
     document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
     document.getElementById('tab' + n).classList.remove('hidden');
   }
 
+  // ===== ЗАГРУЗКА ДАННЫХ =====
   async function loadData() {
     try {
       const [services, examples, bids] = await Promise.all([
-        fetch('/services').then(r => r.json()),
-        fetch('/examples').then(r => r.json()),
-        fetch('/bids').then(r => r.json())
+        fetch('/admin/services').then(r => r.json()),
+        fetch('/admin/examples').then(r => r.json()),
+        fetch('/admin/bids').then(r => r.json())
       ]);
       renderServices(services);
       renderExamples(examples);
@@ -261,95 +286,157 @@
     }
   }
 
+  // ===== ЗАГРУЗКА МОНИТОРИНГА =====
+  async function loadMonitor() {
+    try {
+      const res = await fetch('/admin/monitor');
+      const html = await res.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const logs = doc.querySelector('pre')?.textContent || 'Логи не найдены';
+      document.getElementById('monitorLogs').textContent = logs;
+    } catch (err) {
+      document.getElementById('monitorLogs').textContent = 'Ошибка загрузки логов: ' + err.message;
+    }
+  }
+
+  // ===== РЕНДЕР УСЛУГ =====
   function renderServices(data) {
+    if (!data || data.length === 0) {
+      document.getElementById('servicesList').innerHTML = '<div class="text-slate-400 text-center py-10">Нет услуг</div>';
+      return;
+    }
     let html = `<table class="w-full table-custom"><thead><tr><th class="text-left py-4 pl-2">ID</th><th>Название</th><th>Описание</th><th>Фото</th><th class="text-center">Действия</th></tr></thead><tbody>`;
     data.forEach(item => {
       html += `
-                <tr>
-                    <td class="py-4"><span class="badge-id">#${item.id}</span></td>
-                    <td class="font-medium text-white">${item.name || '—'}</td>
-                    <td class="text-slate-400 max-w-[200px] truncate">${item.description || '—'}</td>
-                    <td><img src="${item.imgLink}" class="thumbnail h-14 w-14 object-cover" alt="img"></td>
-                    <td class="text-center">
-                        <button onclick="deleteItem('service', ${item.id})" class="delete-btn"><i class="fas fa-trash-alt"></i> Удалить</button>
-                    </td>
-                </tr>`;
+        <tr>
+          <td class="py-4"><span class="badge-id">#${item.id}</span></td>
+          <td class="font-medium text-white">${item.name || '—'}</td>
+          <td class="text-slate-400 max-w-[200px] truncate">${item.description || '—'}</td>
+          <td>${item.imgLink ? `<img src="${item.imgLink}" class="thumbnail" alt="img">` : '—'}</td>
+          <td class="text-center">
+            <button onclick="deleteItem('service', ${item.id})" class="delete-btn"><i class="fas fa-trash-alt"></i> Удалить</button>
+          </td>
+        </tr>
+      `;
     });
     html += `</tbody></table>`;
     document.getElementById('servicesList').innerHTML = html;
   }
 
+  // ===== РЕНДЕР ПРИМЕРОВ =====
   function renderExamples(data) {
+    if (!data || data.length === 0) {
+      document.getElementById('examplesList').innerHTML = '<div class="text-slate-400 text-center py-10">Нет примеров</div>';
+      return;
+    }
     let html = `<table class="w-full table-custom"><thead><tr><th class="text-left py-4 pl-2">ID</th><th>Описание</th><th>Фото</th><th class="text-center">Действия</th></tr></thead><tbody>`;
     data.forEach(item => {
       html += `
-                <tr>
-                    <td class="py-4"><span class="badge-id">#${item.id}</span></td>
-                    <td class="text-slate-300">${item.description || '—'}</td>
-                    <td><img src="${item.imgLink}" class="thumbnail h-14 w-14 object-cover" alt="example"></td>
-                    <td class="text-center">
-                        <button onclick="deleteItem('example', ${item.id})" class="delete-btn"><i class="fas fa-trash-alt"></i> Удалить</button>
-                    </td>
-                </tr>`;
+        <tr>
+          <td class="py-4"><span class="badge-id">#${item.id}</span></td>
+          <td class="text-slate-300 max-w-[200px] truncate">${item.description || '—'}</td>
+          <td>${item.imgLink ? `<img src="${item.imgLink}" class="thumbnail" alt="example">` : '—'}</td>
+          <td class="text-center">
+            <button onclick="deleteItem('example', ${item.id})" class="delete-btn"><i class="fas fa-trash-alt"></i> Удалить</button>
+          </td>
+        </tr>
+      `;
     });
     html += `</tbody></table>`;
     document.getElementById('examplesList').innerHTML = html;
   }
 
+  // ===== РЕНДЕР ЗАЯВОК =====
   function renderBids(data) {
-    let html = `<table class="w-full table-custom"><thead><tr><th>ID</th><th>Имя</th><th>Контакт</th><th>Комментарий</th><th class="text-center">Действия</th></tr></thead><tbody>`;
+    if (!data || data.length === 0) {
+      document.getElementById('bidsList').innerHTML = '<div class="text-slate-400 text-center py-10">Нет заявок</div>';
+      return;
+    }
+    let html = `<table class="w-full table-custom"><thead><tr><th>ID</th><th>Имя</th><th>Контакт</th><th>Статус</th><th>Комментарий</th><th class="text-center">Действия</th></tr></thead><tbody>`;
     data.forEach(item => {
       html += `
-                <tr>
-                    <td><span class="badge-id">#${item.id}</span></td>
-                    <td class="font-medium">${item.name || '—'}</td>
-                    <td class="text-blue-300">${item.email || item.number || '—'}</td>
-                    <td class="text-slate-400 max-w-[180px] truncate">${item.comment || '—'}</td>
-                    <td class="text-center">
-                        <button onclick="deleteItem('bid', ${item.id})" class="delete-btn"><i class="fas fa-trash-alt"></i> Удалить</button>
-                    </td>
-                </tr>`;
+        <tr>
+          <td><span class="badge-id">#${item.id}</span></td>
+          <td class="font-medium">${item.name || '—'}</td>
+          <td class="text-blue-300">${item.email || item.phone || '—'}</td>
+          <td><span class="px-3 py-1 rounded-full text-xs ${item.status === 'new' ? 'bg-amber-500/20 text-amber-300' : 'bg-green-500/20 text-green-300'}">${item.status || 'new'}</span></td>
+          <td class="text-slate-400 max-w-[180px] truncate">${item.description || '—'}</td>
+          <td class="text-center">
+            <button onclick="deleteItem('bid', ${item.id})" class="delete-btn"><i class="fas fa-trash-alt"></i> Удалить</button>
+          </td>
+        </tr>
+      `;
     });
     html += `</tbody></table>`;
     document.getElementById('bidsList').innerHTML = html;
   }
 
+  // ===== УДАЛЕНИЕ =====
   async function deleteItem(type, id) {
     if (confirm(`Удалить запись #${id}?`)) {
       try {
-        await fetch(`/admin/${type}/${id}`, { method: 'DELETE' });
-        loadData();
+        const res = await fetch(`/admin/${type}/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          loadData();
+        } else {
+          alert('Ошибка удаления');
+        }
       } catch (err) {
         console.error('Ошибка удаления:', err);
+        alert('Ошибка сети');
       }
     }
   }
 
+  // ===== ФОРМА УСЛУГ =====
   document.getElementById('serviceForm').onsubmit = async (e) => {
     e.preventDefault();
     const form = new FormData(e.target);
     try {
-      await fetch('/admin/service', { method: 'POST', body: form });
-      e.target.reset();
-      loadData();
+      const res = await fetch('/admin/service', { method: 'POST', body: form });
+      if (res.ok) {
+        e.target.reset();
+        loadData();
+      } else {
+        alert('Ошибка добавления услуги');
+      }
     } catch (err) {
-      console.error('Ошибка добавления услуги:', err);
+      console.error('Ошибка:', err);
+      alert('Ошибка сети');
     }
   };
 
+  // ===== ФОРМА ПРИМЕРОВ =====
   document.getElementById('exampleForm').onsubmit = async (e) => {
     e.preventDefault();
     const form = new FormData(e.target);
     try {
-      await fetch('/admin/example', { method: 'POST', body: form });
-      e.target.reset();
-      loadData();
+      const res = await fetch('/admin/example', { method: 'POST', body: form });
+      if (res.ok) {
+        e.target.reset();
+        loadData();
+      } else {
+        alert('Ошибка добавления примера');
+      }
     } catch (err) {
-      console.error('Ошибка добавления примера:', err);
+      console.error('Ошибка:', err);
+      alert('Ошибка сети');
     }
   };
 
+  // ===== ЗАГРУЗКА ПРИ СТАРТЕ =====
   loadData();
+  loadMonitor();
+
+  // ===== ОБНОВЛЕНИЕ МОНИТОРИНГА ПРИ ПЕРЕКЛЮЧЕНИИ =====
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.textContent.includes('Мониторинг')) {
+        loadMonitor();
+      }
+    });
+  });
 </script>
 </body>
 </html>
