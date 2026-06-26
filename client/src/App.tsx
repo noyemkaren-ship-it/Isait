@@ -22,6 +22,11 @@ interface FormData {
   emailOrNumber: number
 }
 
+// 👇 БАЗОВЫЙ URL ДЛЯ КАРТИНОК (через Nginx)
+const IMAGE_BASE = '' // Пусто, потому что Nginx проксирует /uploads/
+// Если через прямой доступ к бэкенду:
+// const IMAGE_BASE = 'http://46.253.132.225:3000'
+
 function App() {
   const [services, setServices] = useState<Service[]>([])
   const [examples, setExamples] = useState<Example[]>([])
@@ -34,7 +39,6 @@ function App() {
   const [nottap, istap] = useState(false)
 
   useEffect(() => {
-    // 👇 Запросы идут через Nginx (прокси на порт 3000)
     fetch('/admin/services').then(res => res.json()).then(setServices).catch(console.error)
     fetch('/admin/examples').then(res => res.json()).then(setExamples).catch(console.error)
   }, [])
@@ -45,7 +49,6 @@ function App() {
     setSuccess(false)
     setLoading(true)
     try {
-      // 👇 Запрос на отправку заявки через Nginx
       const res = await fetch('/admin/bid', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -61,6 +64,19 @@ function App() {
     } finally {
       setLoading(false)
     }
+  }
+
+  // 👇 Функция для правильного формирования URL картинки
+  const getImageUrl = (path: string) => {
+    if (!path) return ''
+    // Если путь уже полный (http://...) — возвращаем как есть
+    if (path.startsWith('http://') || path.startsWith('https://')) return path
+    // Если путь начинается с /uploads/ — оставляем как есть (Nginx проксирует)
+    if (path.startsWith('/uploads/')) return path
+    // Если путь просто uploads/ — добавляем /
+    if (path.startsWith('uploads/')) return `/${path}`
+    // Иначе добавляем /uploads/ в начало
+    return `/uploads/${path}`
   }
 
   const jsonLdSchema = {
@@ -87,7 +103,7 @@ function App() {
               "@type": "Organization",
               "name": "Isait"
             },
-            ...(service.imgLink && { "image": service.imgLink })
+            ...(service.imgLink && { "image": getImageUrl(service.imgLink) })
           }))
         : [])
     ]
@@ -152,7 +168,7 @@ function App() {
                   <div key={s.id} className="service-card">
                     {s.imgLink && (
                       <img 
-                        src={s.imgLink}
+                        src={getImageUrl(s.imgLink)}
                         alt={`${s.name} — профессиональная IT-услуга для бизнеса`} 
                         className="service-img" 
                         loading="lazy"
@@ -183,7 +199,7 @@ function App() {
                     <div key={ex.id} className="service-card">
                       {ex.imgLink && (
                         <img 
-                          src={ex.imgLink}
+                          src={getImageUrl(ex.imgLink)}
                           alt={`Пример реализованного проекта: ${ex.description ? ex.description.substring(0, 80) : 'IT-решение для бизнеса'}`} 
                           className="service-img" 
                           loading="lazy"
